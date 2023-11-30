@@ -48,6 +48,7 @@
                       <li><a href="{{ route('guest') }}" class="active">Home</a></li>
                       <li><a href="{{ route('kostan') }}" >Kamar Kos</a></li>
                       <li><a href="{{ route('contact') }}">Kontak</a></li>
+                      <li><a href="{{ route('login') }}">Login</a></li>
                       <li><a href="{{ route('booking') }}"><i class="fa fa-calendar"></i> Booking</a></li>
                   </ul>   
                     <a class='menu-trigger'>

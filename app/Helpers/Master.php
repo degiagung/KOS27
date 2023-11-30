@@ -37,7 +37,8 @@ class Master
     public function Authenticated($user_id)
     {
 
-        $saved = DB::select("SELECT * FROM users WHERE iduser={$user_id}");
+        $saved = DB::select("SELECT * FROM users WHERE id={$user_id}");
+
         if (count($saved) > 0) {
             $status=[
                 'code'=> self::CODE_SUCCESS,
@@ -55,48 +56,44 @@ class Master
 
     public function AuthenticatedView($route)
     {
-        // $role_id =$this->getSession('role');
+        $role_id =$this->getSession('role_id');
         
-        // $route   ='/'.$route;
+        $route   ='/'.$route;
         
-        // if(Auth::check()){
-        //     $route = str_replace('//', '/', $route);
+        if(Auth::check()){
+            $route = str_replace('//', '/', $route);
             
-        //     if($route == "/"){
+            if($route == "/"){
                 
-        //         $status=[
-        //             'code'=> self::CODE_SUCCESS,
-        //             'info'=> self::INFO_SUCCESS,
-        //         ];
+                $status=[
+                    'code'=> self::CODE_SUCCESS,
+                    'info'=> self::INFO_SUCCESS,
+                ];
                 
-        //         return $status;
-        //     }
+                return $status;
+            }
         
-        //     $saved = DB::select("SELECT * FROM menus_access ma LEFT JOIN users_access ua ON ma.id = ua.menu_access_id WHERE ua.role_id =".$role_id. " AND ma.url ='".$route."'". " AND ua.i_view=1");
-            
-        //     if (count($saved) > 0) {
-        //         $status=[
-        //             'code'=> self::CODE_SUCCESS,
-        //             'info'=> self::INFO_SUCCESS,
-        //         ];
-        //     }else{
-        //         $status=[
-        //             'code'=>  '1',
-        //             'info'=> self::INFO_FAILED,
-        //         ];
-        //     }
-        // }else{
+            $saved = DB::select("SELECT * FROM menus_access ma LEFT JOIN users_access ua ON ma.id = ua.menu_access_id WHERE ua.role_id =".$role_id. " AND ma.url ='".$route."'". " AND ua.i_view=1");
 
-        //     $status=[
-        //         'code'=>  '1',
-        //         'info'=> self::INFO_FAILED,
-        //     ];
-        // }
+            if (count($saved) > 0) {
+                $status=[
+                    'code'=> self::CODE_SUCCESS,
+                    'info'=> self::INFO_SUCCESS,
+                ];
+            }else{
+                $status=[
+                    'code'=>  '1',
+                    'info'=> self::INFO_FAILED,
+                ];
+            }
+        }else{
 
-        $status=[
-            'code'=> self::CODE_SUCCESS,
-            'info'=> self::INFO_SUCCESS,
-        ];
+            $status=[
+                'code'=>  '1',
+                'info'=> self::INFO_FAILED,
+            ];
+        }
+
         return $status;
     }
 
@@ -163,16 +160,18 @@ class Master
     {
         $seskey = "No Auth";
 
-        // if (Auth::check()) {
+        if (Auth::check()) {
             // Jika otentikasi berhasil, simpan data sesi
-            if($param == "iduser"){
-                $seskey = Session::get('iduser');
+            if($param == "user_id"){
+                $seskey = Session::get('user_id');
             }else if($param == "name"){
                 $seskey = Session::get('name');
-            }else if($param == "role"){
-                $seskey = Session::get('role');
+            }else if($param == "role_id"){
+                $seskey = Session::get('role_id');
+            }else if($param == "menu"){
+                $seskey = Session::get('menu');
             } 
-        // }
+        }
 
         return $seskey;
     }
@@ -193,6 +192,37 @@ class Master
             $isData['data'] = null;
         }
         return $isData;
+    }
+
+    public function selectGlobal($kolom = '',$table,$where = null){
+        $query = "
+            SELECT
+                $kolom
+            FROM
+                $table
+        ";
+        if($where != null){
+            $query .= "
+                WHERE $where
+            ";
+        }
+        $select = DB::select($query);
+
+        if ($select != null) {
+            $results = [
+                'code' => self::CODE_SUCCESS,
+                'info' => self::INFO_SUCCESS,
+                'data' => $select // balikin id
+            ];
+        } else {
+            $results = [
+                'code' => self::FAILED,
+                'info' => self::INFO_FAILED,
+                'data' => null
+            ];
+        }
+
+        return $results;
     }
 
     public function saveGlobal($table,$atribut){
@@ -307,3 +337,4 @@ class Master
         return $results;
     }
 }
+
