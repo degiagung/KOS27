@@ -12,7 +12,7 @@
                 <div class="card">
                     <div class="card-header mt-2 flex-wrap d-flex justify-content-between">
                         <div>
-                            <h4 class="card-title">List User</h4>
+                            <h4 class="card-title">List Fasilitas</h4>
                         </div>
                         <ul class="nav nav-tabs dzm-tabs" id="myTab-4" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -26,10 +26,9 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Name</th>
-                                        <th>Email Address</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
+                                        <th>Fasilitas</th>
+                                        <th>Penyedia</th>
+                                        <th>Biaya</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -53,50 +52,24 @@
                         <div class="basic-form">
                             <form>
                                 <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Name</label>
+                                    <label class="col-sm-3 col-form-label">Fasilitas</label>
                                     <div class="col-sm-9">
-                                        <input id="form-name" type="text" class="form-control" placeholder="Name">
+                                        <input id="form-fasilitas" type="text" class="form-control" placeholder="Fasilitas">
                                     </div>
                                 </div>
                                 <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Email</label>
+                                    <label class="col-sm-3 col-form-label">Penyedia</label>
                                     <div class="col-sm-9">
-                                        <input id="form-email" type="email" class="form-control" placeholder="Email">
-                                    </div>
-                                </div>
-                                <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Password</label>
-                                    <div class="col-sm-9">
-                                        <input id="form-password" type="password" class="form-control" placeholder="Password">
-                                    </div>
-                                </div>
-                                <fieldset class="mb-3">
-                                    <div class="row">
-                                        <label class="col-form-label col-sm-3 pt-0">Status</label>
-                                        <div class="col-sm-9">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="form-status"
-                                                    value="1">
-                                                <label class="form-check-label">
-                                                    Active
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="form-status"
-                                                    value="0">
-                                                <label class="form-check-label">
-                                                    Inactive
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                                <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Role</label>
-                                    <div class="col-sm-9">
-                                        <select id="form-role">
-
+                                        <select id="form-penyedia" class="select2">
+                                            <option value="pihak kos">Pihak Kos</option>
+                                            <option value="penghuni">Penghuni</option>
                                         </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Biaya</label>
+                                    <div class="col-sm-9">
+                                        <input id="form-biaya" type="number" class="form-control" min="0" value="0">
                                     </div>
                                 </div>
 

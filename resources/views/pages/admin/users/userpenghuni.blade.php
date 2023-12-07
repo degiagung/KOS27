@@ -43,7 +43,7 @@
         <div class="modal fade" id="modal-data" style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header headermodal">
                         <h5 class="modal-title">Data View</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal">
                         </button>

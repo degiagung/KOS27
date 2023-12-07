@@ -2,16 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pengadaan;
-use App\Models\PengadaanDetail;
-use App\Models\Supplier;
+use App\Models\fasilitas;
 use App\Models\UserAccess;
 use Illuminate\Http\Request;
 use App\Helpers\Master;
 use App\Models\User;
 use App\Models\MenusAccess;
-use App\Models\Obat;
-use App\Models\Satuan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -19,8 +15,7 @@ use Illuminate\Support\Facades\Session;
 
 class JsonDataController extends Controller
 {   
-    public function signup()
-    {
+    public function signup(){
         $attributes = request()->validate([
             'name' => ['required', 'max:50'],
             'email' => 'required|max:50|unique:users',
@@ -65,7 +60,6 @@ class JsonDataController extends Controller
 
         return $MasterClass->Results($results);
     }
-    
     // for list menu side bar
     public function getAccessMenu(Request $request){
 
@@ -576,6 +570,67 @@ class JsonDataController extends Controller
                         LEFT JOIN users_roles ur ON us.role_id = ur.id
                     ';
                     $where = " ur.role_name like  'penghuni' ";
+                    $result = $MasterClass->selectGlobal($select,$table,$where);
+                    
+                    $results = [
+                        'code'  => $result['code'],
+                        'info'  => $result['info'],
+                        'data'  => $result['data'],
+                    ];
+                        
+        
+        
+                } else {
+                    $results = [
+                        'code' => '103',
+                        'info'  => "Method Failed",
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Roll back the transaction in case of an exception
+                $results = [
+                    'code' => '102',
+                    'info'  => $e->getMessage(),
+                ];
+    
+            }
+        }
+        else {
+    
+            $results = [
+                'code' => '403',
+                'info'  => "Unauthorized",
+            ];
+            
+        }
+
+        return $MasterClass->Results($results);
+
+    }
+    public function getListKamar(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            try {
+                if ($request->isMethod('post')) {
+
+                    DB::beginTransaction();     
+                    
+                    $status = [];
+                    
+                    $select = "
+                        k.id,
+                        k.lantai,
+                        k.no_kamar
+                    ";
+                    
+                    $table = '
+                        kamar k
+                    ';
+                    // $where = " ur.role_name like  'penghuni' ";
                     $result = $MasterClass->selectGlobal($select,$table);
                     
                     $results = [
@@ -613,9 +668,7 @@ class JsonDataController extends Controller
         return $MasterClass->Results($results);
 
     }
-
-    //CRUD FUNCTION
-    public function saveUser(Request $request){
+    public function getListFasilitas(Request $request){
 
         $MasterClass = new Master();
 
@@ -626,50 +679,84 @@ class JsonDataController extends Controller
                 if ($request->isMethod('post')) {
 
                     DB::beginTransaction();     
+                    
+                    $status = [];
+                    
+                    $select = "
+                        f.*
+                    ";
+                    
+                    $table = '
+                        fasilitas f
+                    ';
+                    // $where = " ur.role_name like  'penghuni' ";
+                    $result = $MasterClass->selectGlobal($select,$table);
+                    
+                    $results = [
+                        'code'  => $result['code'],
+                        'info'  => $result['info'],
+                        'data'  => $result['data'],
+                    ];
+                        
+        
+        
+                } else {
+                    $results = [
+                        'code' => '103',
+                        'info'  => "Method Failed",
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Roll back the transaction in case of an exception
+                $results = [
+                    'code' => '102',
+                    'info'  => $e->getMessage(),
+                ];
+    
+            }
+        }
+        else {
+    
+            $results = [
+                'code' => '403',
+                'info'  => "Unauthorized",
+            ];
+            
+        }
+
+        return $MasterClass->Results($results);
+
+    }
+    public function getPenghuni(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            try {
+                if ($request->isMethod('post')) {
 
                     $data = json_decode($request->getContent());
-             
-                    $status = [];
-                    if ($data->password){
-                        
-                        $saved = User::updateOrCreate(
-                            [
-                                'id' => $data->id,
-                            ], 
-                            [
-                                'name' => $data->name,
-                                'email'=> $data->email,
-                                'role_id' => $data->role_id,
-                                'password' => Hash::make($data->password),
-                                'is_active' => $data->is_active,
-                            ] // Kolom yang akan diisi
-                        );
 
-                    }else{
-                      
-                        $saved = User::updateOrCreate(
-                            [
-                                'id' => $data->id,
-                            ], 
-                            [
-                                'name' => $data->name,
-                                'email'=> $data->email,
-                                'role_id' => $data->role_id,
-                                'is_active' => $data->is_active,
-                            ] // Kolom yang akan diisi
-                        );
-                        
-                    }
                     
+                    DB::beginTransaction();
+            
+                    $status = [];
+  
+                    $saved = DB::select("SELECT us.* FROM users us
+                            LEFT JOIN users_roles ur ON us.role_id = ur.id 
+                            where 
+                            ur.role_name like  'penghuni' ");
                     $saved = $MasterClass->checkErrorModel($saved);
                     
                     $status = $saved;
  
-                    if($status['code'] == $MasterClass::CODE_SUCCESS){
-                        DB::commit();
-                    }else{
-                        DB::rollBack();
-                    }
+                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                    //     DB::commit();
+                    // }else{
+                    //     DB::rollBack();
+                    // }
         
                     $results = [
                         'code' => $status['code'],
@@ -706,7 +793,137 @@ class JsonDataController extends Controller
         return $MasterClass->Results($results);
 
     }
-    public function deleteUser(Request $request){
+    public function getTipeKamar(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            try {
+                if ($request->isMethod('post')) {
+
+                    $data = json_decode($request->getContent());
+
+                    
+                    DB::beginTransaction();
+            
+                    $status = [];
+  
+                    $saved = DB::select("SELECT * FROM tipe_kamar ");
+                    $saved = $MasterClass->checkErrorModel($saved);
+                    
+                    $status = $saved;
+ 
+                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                    //     DB::commit();
+                    // }else{
+                    //     DB::rollBack();
+                    // }
+        
+                    $results = [
+                        'code' => $status['code'],
+                        'info'  => $status['info'],
+                        'data'  =>  $status['data'],
+                    ];
+                        
+        
+        
+                } else {
+                    $results = [
+                        'code' => '103',
+                        'info'  => "Method Failed",
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Roll back the transaction in case of an exception
+                $results = [
+                    'code' => '102',
+                    'info'  => $e->getMessage(),
+                ];
+    
+            }
+        }
+        else {
+    
+            $results = [
+                'code' => '403',
+                'info'  => "Unauthorized",
+            ];
+            
+        }
+
+        return $MasterClass->Results($results);
+
+    }
+    public function getFasilitas(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            try {
+                if ($request->isMethod('post')) {
+
+                    DB::beginTransaction();
+            
+                    $status = [];
+                    
+                    if($request->jenis == 'kos'){
+                        $where = "where penyedia= 'pihak kos'";
+                    }elseif($request->jenis == 'penghuni'){
+                        $where = "where penyedia= 'penghuni'";
+                    }else{
+                        $where = '';
+                    }
+                    $saved = DB::select("SELECT * FROM fasilitas $where");
+                    $saved = $MasterClass->checkErrorModel($saved);
+                    
+                    $status = $saved;
+ 
+                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                    //     DB::commit();
+                    // }else{
+                    //     DB::rollBack();
+                    // }
+        
+                    $results = [
+                        'code' => $status['code'],
+                        'info'  => $status['info'],
+                        'data'  =>  $status['data'],
+                    ];
+                        
+        
+        
+                } else {
+                    $results = [
+                        'code' => '103',
+                        'info'  => "Method Failed",
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Roll back the transaction in case of an exception
+                $results = [
+                    'code' => '102',
+                    'info'  => $e->getMessage(),
+                ];
+    
+            }
+        }
+        else {
+    
+            $results = [
+                'code' => '403',
+                'info'  => "Unauthorized",
+            ];
+            
+        }
+
+        return $MasterClass->Results($results);
+
+    }
+    public function getListTipeKamar(Request $request){
 
         $MasterClass = new Master();
 
@@ -717,27 +934,23 @@ class JsonDataController extends Controller
                 if ($request->isMethod('post')) {
 
                     DB::beginTransaction();     
-
-                    $data = json_decode($request->getContent());
                     
                     $status = [];
-
-                    $saved = User::where('id', $data->id)->delete();
                     
-                    $saved = $MasterClass->checkerrorModelUpdate($saved);
+                    $select = "
+                        tk.*
+                    ";
                     
-                    $status = $saved;
- 
-                    if($status['code'] == $MasterClass::CODE_SUCCESS){
-                        DB::commit();
-                    }else{
-                        DB::rollBack();
-                    }
-        
+                    $table = '
+                        tipe_kamar tk
+                    ';
+                    // $where = " ur.role_name like  'penghuni' ";
+                    $result = $MasterClass->selectGlobal($select,$table);
+                    
                     $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
+                        'code'  => $result['code'],
+                        'info'  => $result['info'],
+                        'data'  => $result['data'],
                     ];
                         
         
@@ -769,68 +982,328 @@ class JsonDataController extends Controller
         return $MasterClass->Results($results);
 
     }
-    public function deleteGlobal(Request $request){
+    //CRUD FUNCTION
+        public function saveUser(Request $request){
 
-        $MasterClass = new Master();
+            $MasterClass = new Master();
 
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    DB::beginTransaction();     
-
-                    $data = json_decode($request->getContent());
-                    
-                    $status = [];
-
-                    $saved =   DB::table($data->tableName)->where('id', $data->id)->delete();
-                    
-                    $saved = $MasterClass->checkerrorModelUpdate($saved);
-                    
-                    $status = $saved;
- 
-                    if($status['code'] == $MasterClass::CODE_SUCCESS){
-                        DB::commit();
-                    }else{
-                        DB::rollBack();
-                    }
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
-                        
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
             
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $data = json_decode($request->getContent());
+                
+                        $status = [];
+                        if ($data->password){
+                            
+                            $saved = User::updateOrCreate(
+                                [
+                                    'id' => $data->id,
+                                ], 
+                                [
+                                    'name' => $data->name,
+                                    'email'=> $data->email,
+                                    'role_id' => $data->role_id,
+                                    'password' => Hash::make($data->password),
+                                    'is_active' => $data->is_active,
+                                ] // Kolom yang akan diisi
+                            );
+
+                        }else{
+                        
+                            $saved = User::updateOrCreate(
+                                [
+                                    'id' => $data->id,
+                                ], 
+                                [
+                                    'name' => $data->name,
+                                    'email'=> $data->email,
+                                    'role_id' => $data->role_id,
+                                    'is_active' => $data->is_active,
+                                ] // Kolom yang akan diisi
+                            );
+                            
+                        }
+                        
+                        $saved = $MasterClass->checkErrorModel($saved);
+                        
+                        $status = $saved;
+    
+                        if($status['code'] == $MasterClass::CODE_SUCCESS){
+                            DB::commit();
+                        }else{
+                            DB::rollBack();
+                        }
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
         }
+        public function deleteUser(Request $request){
 
-        return $MasterClass->Results($results);
+            $MasterClass = new Master();
 
-    }
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $data = json_decode($request->getContent());
+                        
+                        $status = [];
+
+                        $saved = User::where('id', $data->id)->delete();
+                        
+                        $saved = $MasterClass->checkerrorModelUpdate($saved);
+                        
+                        $status = $saved;
+    
+                        if($status['code'] == $MasterClass::CODE_SUCCESS){
+                            DB::commit();
+                        }else{
+                            DB::rollBack();
+                        }
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function actionFasilitas(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $data       = json_decode($request->getContent());
+                        $id         = $data->id;
+
+                        if($data->tipe == 'deleted'){
+                             $where     = [
+                                'id' => $id
+                            ];
+                            $saved      = $MasterClass->deleteGlobal('fasilitas', $where );
+                        }else{
+                            
+                            $fasilitas  = $data->name;
+                            $penyedia   = $data->penyedia;
+                            $biaya      = $data->biaya;
+                            if($id){
+                                $attributes     = [
+                                    'fasilitas' => $fasilitas,
+                                    'penyedia'  => $penyedia,
+                                    'biaya'     => $biaya,
+                                ];
+                                $where     = [
+                                    'id' => $id
+                                ];
+                                $saved      = $MasterClass->updateGlobal('fasilitas', $attributes,$where );
+                                $status     = $saved;
+                            }else{
+                                $attributes     = [
+                                    'fasilitas' => $fasilitas,
+                                    'penyedia'  => $penyedia,
+                                    'biaya'     => $biaya,
+                                ];
+                                $saved      = $MasterClass->saveGlobal('fasilitas', $attributes );
+                                
+                            }
+                        }
+                        $status     = $saved;
+                        if($status['code'] == $MasterClass::CODE_SUCCESS){
+                            DB::commit();
+                        }else{
+                            DB::rollBack();
+                        }
+            
+                        $results = [
+                            'code'  => $status['code'],
+                            'info'  => $status['info'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function actionTipeKamar(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $data       = json_decode($request->getContent());
+                        $id         = $data->id;
+                        $table      = 'tipe_kamar';
+                        if($data->tipe == 'deleted'){
+                             $where     = [
+                                'id' => $id
+                            ];
+                            $saved      = $MasterClass->deleteGlobal($table, $where );
+                        }else{
+                            
+                            $fasilitas  = $data->name;
+                            if($id){
+                                $attributes     = [
+                                    'tipe' => $fasilitas
+                                ];
+                                $where     = [
+                                    'id' => $id
+                                ];
+                                $saved      = $MasterClass->updateGlobal($table, $attributes,$where );
+                                $status     = $saved;
+                            }else{
+                                $attributes     = [
+                                    'tipe' => $fasilitas
+                                ];
+                                $saved      = $MasterClass->saveGlobal($table, $attributes );
+                                
+                            }
+                        }
+                        $status     = $saved;
+                        if($status['code'] == $MasterClass::CODE_SUCCESS){
+                            DB::commit();
+                        }else{
+                            DB::rollBack();
+                        }
+            
+                        $results = [
+                            'code'  => $status['code'],
+                            'info'  => $status['info'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
 
 }

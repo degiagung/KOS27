@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Helpers\Master;
 use App\Models\Pengadaan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+
 
 class GeneralController extends Controller
 {
@@ -27,7 +31,7 @@ class GeneralController extends Controller
         $MasterClass = new Master();
 
         $checkAuth = $MasterClass->AuthenticatedView($request->route()->uri());
-        
+
         if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
            
             $javascriptFiles = [
@@ -162,6 +166,150 @@ class GeneralController extends Controller
             ];
         
             return view('pages.admin.users.userpenghuni')
+                ->with($data);
+        }else{
+            return redirect('/login');
+        }
+        
+    }
+    public function listkamar(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->AuthenticatedView($request->route()->uri());
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            $javascriptFiles = [
+                asset('action-js/global/global-action.js'),
+                // asset('action-js/generate/generate-action.js'),
+                asset('action-js/property/listkamar-action.js'),
+            ];
+        
+            $cssFiles = [
+                // asset('css/main.css'),
+                // asset('css/custom.css'),
+            ];
+            $baseURL = url('/');
+            $varJs = [
+                'const baseURL = "' . $baseURL . '"',
+            ];
+    
+            $data = [
+                'javascriptFiles' => $javascriptFiles,
+                'cssFiles' => $cssFiles,
+                'varJs'=> $varJs
+                 // Menambahkan base URL ke dalam array
+            ];
+        
+            return view('pages.admin.property.listkamar')
+                ->with($data);
+        }else{
+            return redirect('/login');
+        }
+        
+    }
+    public function listfasilitas(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->AuthenticatedView($request->route()->uri());
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            $javascriptFiles = [
+                asset('action-js/global/global-action.js'),
+                // asset('action-js/generate/generate-action.js'),
+                asset('action-js/property/listfasilitas-action.js'),
+            ];
+        
+            $cssFiles = [
+                // asset('css/main.css'),
+                // asset('css/custom.css'),
+            ];
+            $baseURL = url('/');
+            $varJs = [
+                'const baseURL = "' . $baseURL . '"',
+            ];
+    
+            $data = [
+                'javascriptFiles' => $javascriptFiles,
+                'cssFiles' => $cssFiles,
+                'varJs'=> $varJs
+                 // Menambahkan base URL ke dalam array
+            ];
+        
+            return view('pages.admin.property.listfasilitas')
+                ->with($data);
+        }else{
+            return redirect('/login');
+        }
+        
+    }
+    public function mappingfasilitas(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->AuthenticatedView($request->route()->uri());
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            $javascriptFiles = [
+                asset('action-js/global/global-action.js'),
+                // asset('action-js/generate/generate-action.js'),
+                asset('action-js/management/mappingfasilitas-action.js'),
+            ];
+        
+            $cssFiles = [
+                // asset('css/main.css'),
+                // asset('css/custom.css'),
+            ];
+            $baseURL = url('/');
+            $varJs = [
+                'const baseURL = "' . $baseURL . '"',
+            ];
+    
+            $data = [
+                'javascriptFiles' => $javascriptFiles,
+                'cssFiles' => $cssFiles,
+                'varJs'=> $varJs
+                 // Menambahkan base URL ke dalam array
+            ];
+        
+            return view('pages.admin.management.mappingfasilitas')
+                ->with($data);
+        }else{
+            return redirect('/login');
+        }
+        
+    }
+    public function listTipeKamar(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->AuthenticatedView($request->route()->uri());
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            $javascriptFiles = [
+                asset('action-js/global/global-action.js'),
+                // asset('action-js/generate/generate-action.js'),
+                asset('action-js/property/listtipekamar-action.js'),
+            ];
+        
+            $cssFiles = [
+                // asset('css/main.css'),
+                // asset('css/custom.css'),
+            ];
+            $baseURL = url('/');
+            $varJs = [
+                'const baseURL = "' . $baseURL . '"',
+            ];
+    
+            $data = [
+                'javascriptFiles' => $javascriptFiles,
+                'cssFiles' => $cssFiles,
+                'varJs'=> $varJs
+                 // Menambahkan base URL ke dalam array
+            ];
+        
+            return view('pages.admin.property.listtipekamar')
                 ->with($data);
         }else{
             return redirect('/login');

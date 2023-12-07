@@ -63,7 +63,7 @@ class Master
         if(Auth::check()){
             $route = str_replace('//', '/', $route);
             
-            if($route == "/"){
+            if($route == "/dashboard"){
                 
                 $status=[
                     'code'=> self::CODE_SUCCESS,
@@ -207,12 +207,13 @@ class Master
             ";
         }
         $select = DB::select($query);
+        $select = $this->checkErrorModel($select);
 
-        if ($select != null) {
+        if ($select['code'] == '0') {
             $results = [
                 'code' => self::CODE_SUCCESS,
                 'info' => self::INFO_SUCCESS,
-                'data' => $select // balikin id
+                'data' => $select['data'] // balikin id
             ];
         } else {
             $results = [
@@ -238,6 +239,7 @@ class Master
         $saved = DB::table($table)->insertGetId(
             $atribut
         );
+        
         if ($saved != null) {
             $results = [
                 'code' => self::CODE_SUCCESS,
@@ -320,8 +322,6 @@ class Master
             $query->where($field, $value);
         }
         $deleted = $query->delete();
-
-        // dd($saved);
         if ($deleted) {
             $results = [
                 'code' => self::CODE_SUCCESS,

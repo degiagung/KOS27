@@ -99,7 +99,6 @@ function getMenuAccess() {
     });
 }
 
-
 function validationSwalFailed(param, isText) {
     // console.log(param);
     if (param == "" || param == null) {
@@ -107,4 +106,36 @@ function validationSwalFailed(param, isText) {
 
         return 1;
     }
+}
+
+function formatRupiah(angka, prefix) {
+    // var angka = angka.split(".");
+	if(angka){
+		var seeminus = angka.substr(0,1);
+		if(seeminus == '-'){
+			var minus = '-';
+			var angka = angka.substr(1).replace(/[^,\d]/g, ',');
+		}else{
+			var minus = '';
+			
+			var angka = angka.replace(/[^,\d]/g, ',');
+		}
+		var number_string = angka.toString(),
+			split = number_string.split(","),
+			sisa = split[0].length % 3,
+			rupiah = split[0].substr(0, sisa),
+			ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+		// tambahkan titik jika yang di input sudah menjadi angka ribuan
+		
+		if (ribuan) {
+			separator = sisa ? "," : "";
+			rupiah += separator + ribuan.join(",");
+		}
+	
+		rupiah = split[1] != undefined ? minus+rupiah + "." + split[1] : rupiah;
+		return prefix == undefined ? rupiah : rupiah ? "Rp " + rupiah : "";
+	}else{
+		return '';
+	}
+    
 }

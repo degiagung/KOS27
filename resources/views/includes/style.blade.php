@@ -23,7 +23,6 @@
         rel="stylesheet">
     <link href="{{ asset('template/admin/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('template/admin/vendor/sweetalert2/dist/sweetalert2.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('template/admin/vendor/select2/css/select2.min.css') }}">
     <!-- tagify-css -->
 
     <link href="{{ asset('template/admin/vendor/bootstrap-daterangepicker/daterangepicker.css') }}" rel="stylesheet">
@@ -55,4 +54,5 @@
     <!-- Template Main CSS File -->
     <link href="{{ asset('../assets2/css/style.css') }}" rel="stylesheet">
     {{-- <link href="{{ asset('template/admin/css/style.css') }}" rel="stylesheet"> --}}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
