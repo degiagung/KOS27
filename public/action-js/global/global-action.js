@@ -89,12 +89,12 @@ function getMenuAccess() {
                 // Setelah loop selesai, append semua grup ke elemen dengan class "isSidebarMenu"
                 $(".isSidebarMenu").html(allGroupHTML);
             } else {
-                sweetAlert("Oops...", response.info, "error");
+                sweetAlert("Oops...", response.info, "ERROR");
             }
         },
         error: function (xhr, status, error) {
             // Handle error response
-            sweetAlert("Oops...", xhr.responseText, "error");
+            sweetAlert("Oops...", "ERROR", "ERROR");
         },
     });
 }
@@ -138,4 +138,97 @@ function formatRupiah(angka, prefix) {
 		return '';
 	}
     
+}
+function datetostring2(p1,p2,p3){
+	var month   = new Array();
+    month[0]    = "Januari";
+    month[1]    = "Februari";
+    month[2]    = "Maret";
+    month[3]    = "April";
+    month[4]    = "Mei";
+    month[5]    = "Juni";
+    month[6]    = "Juli";
+    month[7]    = "Agustus";
+    month[8]    = "September";
+    month[9]    = "Oktober";
+    month[10]   = "November";
+    month[11]   = "Desember";
+
+	if(p1 != null && p2 != null){
+		if(p1 == 'yymmdd'){
+			p2   		= p2.toString().replaceAll('-','');
+			yyyy 		= p2.substring(0,4);
+			mm 			= p2.substring(4,6);
+			dd 			= p2.substring(6,8);
+		
+
+			var a       = new Date(yyyy+'-'+mm+'-'+''+dd);
+			var tgl     = ('0' + a.getDate()).slice(-2);
+			var bulan   = month[a.getMonth()]
+			var tahun   = a.getFullYear();
+			return tgl+' '+bulan+' '+tahun ;
+		}
+		if(p1 == 'His'){
+			p2   		= p2.toString();
+			h			= p2.substring(0,2);
+			i			= p2.substring(2,4);
+			s			= p2.substring(4,6);
+			return h+':'+i+':'+s ;
+		}
+		if(p1 == 'yymmdd His'){
+			p2   		= p2.toString();
+			p3			= p3.toString();
+			yyyy 		= p2.substring(0,4);
+			mm 			= p2.substring(4,6);
+			dd 			= p2.substring(6,8);
+			h			= p3.substring(0,2);
+			i			= p3.substring(2,4);
+			s			= p3.substring(4,6);
+		
+
+			var a       = new Date(yyyy+'-'+mm+'-'+''+dd);
+			var tgl     = ('0' + a.getDate()).slice(-2);
+			var bulan   = month[a.getMonth()]
+			var tahun   = a.getFullYear();
+			return tgl+' '+bulan+' '+tahun+' '+h+':'+i+':'+s ;
+		}
+		if(p1 == 'yymm'){
+			var bln     = p2.substring(4,5);
+			if(bln == 0){
+				bln     = p2.substring(5,6);
+			}else{
+				bln     = p2.substring(4,6);
+			}
+
+			var bulan   = month[parseInt(bln)-1]
+			if(bulan == -1){
+				bulan = 0;
+			}
+
+			var tahun   = p2.substring(0, 4);
+			return bulan+' '+tahun ;
+		}
+		if(p1 == 'yymmdd His nyatu'){
+			var a       = new Date(p2.substring(0,19));
+			var tgl     = ('0' + a.getDate()).slice(-2);
+			var bulan   = month[a.getMonth()]
+			var tahun   = a.getFullYear();
+			var h       = String(a.getHours()).padStart(2, '0');
+			var m       = String(a.getMinutes()).padStart(2, '0');
+			var s		= String(a.getSeconds()).padStart(2, '0');
+			return tgl+' '+bulan+' '+tahun+' '+h+':'+m+':'+s ;
+		}
+		
+	}else{
+		return '';
+	}
+}
+
+function swalwarning(text){
+	swal({
+		icon    : "warning",
+		title   : 'Oops...',
+		text    : text,
+		// timer	: 6000
+	});
 }

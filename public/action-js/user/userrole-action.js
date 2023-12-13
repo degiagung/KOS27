@@ -268,13 +268,13 @@ function loadRoleMenu(rowData) {
                 ArrCheckPermission = data;
                 loadRole(rowData);
             } else {
-                sweetAlert("Oops...", response.info, "error");
+                sweetAlert("Oops...", response.info, "ERROR");
             }
         },
         error: function (xhr, status, error) {
             // Handle error response
-            console.log(xhr.responseText);
-            sweetAlert("Oops...", xhr.responseText, "error");
+            console.log("ERROR");
+            sweetAlert("Oops...", "ERROR", "ERROR");
         },
     });
 }
@@ -352,13 +352,13 @@ function loadRole(rowData) {
                 $("#base-form").html(el);
                 $("#modal-data").modal("show");
             } else {
-                sweetAlert("Oops...", response.info, "error");
+                sweetAlert("Oops...", response.info, "ERROR");
             }
         },
         error: function (xhr, status, error) {
             // Handle error response
-            console.log(xhr.responseText);
-            sweetAlert("Oops...", xhr.responseText, "error");
+            console.log("ERROR");
+            sweetAlert("Oops...", "ERROR", "ERROR");
         },
     });
 }
@@ -408,13 +408,13 @@ function savePermission() {
                     location.reload();
                 });
             } else {
-                sweetAlert("Oops...", response.info, "error");
+                sweetAlert("Oops...", response.info, "ERROR");
             }
         },
         error: function (xhr, status, error) {
             // Handle error response
-            console.log(xhr.responseText);
-            sweetAlert("Oops...", xhr.responseText, "error");
+            console.log("ERROR");
+            sweetAlert("Oops...", "ERROR", "ERROR");
         },
     });
 }
@@ -451,13 +451,13 @@ function updateDataMenu() {
                     location.reload();
                 });
             } else {
-                sweetAlert("Oops...", response.info, "error");
+                sweetAlert("Oops...", response.info, "ERROR");
             }
         },
         error: function (xhr, status, error) {
             // Handle error response
-            console.log(xhr.responseText);
-            sweetAlert("Oops...", xhr.responseText, "error");
+            console.log("ERROR");
+            sweetAlert("Oops...", "ERROR", "ERROR");
         },
     });
 }
@@ -482,7 +482,7 @@ function saveConfirm(params) {
                 updateDataMenu()
             }
         } else {
-            swal("Cancelled !!", "Okey, Cancelled !!", "error");
+            swal("Cancelled !!", "Okey, Cancelled !!", "ERROR");
         }
     });
 }
@@ -514,6 +514,6 @@ function saveConfirm(params) {
 //             dropdownParent: $("#modal-data"),
 //         });
 //     } catch (error) {
-//         sweetAlert("Oops...", error.responseText, "error");
+//         sweetAlert("Oops...", error.responseText, "ERROR");
 //     }
 // }

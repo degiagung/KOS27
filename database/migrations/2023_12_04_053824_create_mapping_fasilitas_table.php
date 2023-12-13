@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_kamar');
             $table->unsignedBigInteger('id_fasilitas');
+            $table->varchar('status')->default('aman');
             $table->timestamps();
 
 

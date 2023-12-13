@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('alamat');
             $table->string('size');
             $table->string('tipe');
+            $table->string('jenis');
             $table->timestamps();
 
             $table->foreign('id_kamar')

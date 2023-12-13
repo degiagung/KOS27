@@ -186,20 +186,20 @@ function deleteData(data) {
                     if (response.code == 0) {
                         swal("Berhasil Delete !", response.message, "success");
                     } else {
-                        sweetAlert("Oops...", response.message, "error");
+                        sweetAlert("Oops...", response.message, "ERROR");
                     }
                 },
                 error: function (xhr, status, error) {
                     // Handle error response
-                    // console.log(xhr.responseText);
-                    sweetAlert("Oops...", xhr.responseText, "error");
+                    // console.log("ERROR");
+                    sweetAlert("Oops...", "ERROR", "ERROR");
                 },
             });
         } else {
             swal(
                 "Cancelled !!",
                 "Hey, your imaginary file is safe !!",
-                "error"
+                "ERROR"
             );
         }
     });
@@ -228,11 +228,11 @@ function saveData() {
             if (response.code == 0) {
                 swal("Berhasil !", response.message, "success");
             } else {
-                sweetAlert("Oops...", response.message, "error");
+                sweetAlert("Oops...", response.message, "ERROR");
             }
         },
         error: function (xhr, status, error) {
-            sweetAlert("Oops...", xhr.responseText, "error");
+            sweetAlert("Oops...", "ERROR", "ERROR");
         },
     });
 }

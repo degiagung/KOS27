@@ -201,20 +201,20 @@ function deleteData(data) {
                             }
                         );
                     } else {
-                        sweetAlert("Oops...", response.message, "error");
+                        sweetAlert("Oops...", response.message, "ERROR");
                     }
                 },
                 error: function (xhr, status, error) {
                     // Handle error response
-                    // console.log(xhr.responseText);
-                    sweetAlert("Oops...", xhr.responseText, "error");
+                    // console.log("ERROR");
+                    sweetAlert("Oops...", "ERROR", "ERROR");
                 },
             });
         } else {
             swal(
                 "Cancelled !!",
                 "Hey, your imaginary file is safe !!",
-                "error"
+                "ERROR"
             );
         }
     });
@@ -243,13 +243,13 @@ function saveData() {
                 });
                 // Reset form
             } else {
-                sweetAlert("Oops...", response.message, "error");
+                sweetAlert("Oops...", response.message, "ERROR");
             }
         },
         error: function (xhr, status, error) {
             // Handle error response
-            // console.log(xhr.responseText);
-            sweetAlert("Oops...", xhr.responseText, "error");
+            // console.log("ERROR");
+            sweetAlert("Oops...", "ERROR", "ERROR");
         },
     });
 }
@@ -281,6 +281,6 @@ async function loadRole() {
             dropdownParent: $("#modal-data"),
         });
     } catch (error) {
-        sweetAlert("Oops...", error.responseText, "error");
+        sweetAlert("Oops...", error.responseText, "ERROR");
     }
 }

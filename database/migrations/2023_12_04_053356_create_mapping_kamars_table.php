@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('mapping_kamar', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('id_kamar');
             $table->unsignedBigInteger('id_tipe');
-            $table->timestamp('tgl_awal');
-            $table->timestamp('tgl_akhir');
+            $table->timestamp('tgl_awal')->nullable();
+            $table->timestamp('tgl_akhir')->nullable();
             $table->timestamps();
             
             

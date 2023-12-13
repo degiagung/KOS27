@@ -36,7 +36,7 @@ class GeneralController extends Controller
            
             $javascriptFiles = [
                 asset('action-js/global/global-action.js'),
-                // asset('action-js/generate/generate-action.js'),
+                asset('action-js/dashboard-action.js'),
             ];
         
             $cssFiles = [

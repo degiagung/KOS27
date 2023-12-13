@@ -624,14 +624,73 @@ class JsonDataController extends Controller
                     $select = "
                         k.id,
                         k.lantai,
-                        k.no_kamar
+                        k.no_kamar,
+                        k.status,
+                        GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
+                        GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp,
+                        GROUP_CONCAT(fs.id SEPARATOR ',') as idfaskos,
+                        GROUP_CONCAT(fsp.id SEPARATOR ',') as idfaskosp,
+                        CASE
+                            WHEN mk.tgl_awal is not null THEN 'Sudah Terisi'
+                            else 'Kosong'
+                        END as status_kamar,
+                        us.name,
+                        mk.user_id,
+                        concat(mk.tgl_awal,' SD ',mk.tgl_akhir) as durasi,
+                        CONVERT(mk.tgl_awal,date) tgl_awal,
+                        CONVERT(mk.tgl_akhir,date) tgl_akhir,
+                        CONVERT(mk.tgl_akhir,date) - CURRENT_DATE as sisa_durasi
                     ";
                     
-                    $table = '
+                    $table = "
                         kamar k
-                    ';
-                    // $where = " ur.role_name like  'penghuni' ";
-                    $result = $MasterClass->selectGlobal($select,$table);
+                        LEFT JOIN mapping_kamar mk ON k.id = mk.id_kamar
+                        LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
+                        LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id AND fs.penyedia = 'pihak kos'
+                        LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id AND fsp.penyedia = 'penghuni'
+                        LEFT JOIN tipe_kamar tk ON mk.id_tipe = tk.id
+                        LEFT JOIN users us ON mk.user_id = us.id
+                    ";
+
+                    $where = " 
+                        k.id is not null
+                    ";
+                    $status     = $request->status ;
+                    $kondisi    = $request->kondisi ;
+                    if($status == 1){
+                        $where .="
+                             AND mk.user_id is not null
+                        ";
+                    }elseif($status == 2){
+                         $where .="
+                             AND mk.user_id is null
+                        ";
+                    }
+
+                    if($kondisi == 1){
+                        $where .="
+                             AND k.status is null
+                        ";
+                    }elseif($kondisi == 2){
+                         $where .="
+                             AND k.status = 'perbaikan'
+                        ";
+                    }
+
+                    $where .= " 
+                        GROUP BY
+                        k.id,
+                        k.lantai,
+                        k.no_kamar,
+                        k.status,
+                        mk.tgl_awal,
+                        us.name,
+                        mk.tgl_awal,
+                        mk.tgl_akhir,
+                        mk.user_id
+                        ORDER BY mk.tgl_akhir asc
+                    ";
+                    $result = $MasterClass->selectGlobal($select,$table,$where);
                     
                     $results = [
                         'code'  => $result['code'],
@@ -982,6 +1041,102 @@ class JsonDataController extends Controller
         return $MasterClass->Results($results);
 
     }
+    public function listKamarDashboard(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            try {
+                if ($request->isMethod('post')) {
+
+                    DB::beginTransaction();     
+                    
+                    $status = [];
+                    
+                    $select = "
+                        k.id,
+                        k.lantai,
+                        k.no_kamar,
+                        GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
+                        CASE
+                            WHEN mk.tgl_awal is not null THEN 'Sudah Terisi'
+                            else 'Kosong'
+                        END as status_kamar,
+                        us.name,
+                        concat(mk.tgl_awal,' SD ',mk.tgl_akhir) as durasi,
+                        mk.tgl_awal,
+                        mk.tgl_akhir,
+                        CONVERT(mk.tgl_akhir,date) - CURRENT_DATE as sisa_durasi
+                    ";
+                    
+                    $table = '
+                        kamar k
+                        LEFT JOIN mapping_kamar mk ON k.id = mk.id_kamar
+                        LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
+                        LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id
+                        LEFT JOIN tipe_kamar tk ON mk.id_tipe = tk.id
+                        LEFT JOIN users us ON mk.user_id = us.id
+                    ';
+                    $where = " 
+                        mk.user_id is not null
+                    ";
+                    $sisawaktu = $request->sisawaktu ;
+                    if($sisawaktu){
+                        $where .="
+                             AND (CONVERT(mk.tgl_akhir,date) - CURRENT_DATE) >= 0 AND (CONVERT(mk.tgl_akhir,date) - CURRENT_DATE) $sisawaktu 
+                        ";
+                    }
+                    $where .= "GROUP BY
+                        k.id,
+                        k.lantai,
+                        k.no_kamar,
+                        mk.tgl_awal,
+                        us.name,
+                        mk.tgl_awal,
+                        mk.tgl_akhir
+                        ORDER BY mk.tgl_akhir asc
+                    ";
+
+                    // print_r($where);die;;
+                    $result = $MasterClass->selectGlobal($select,$table,$where);
+                    
+                    $results = [
+                        'code'  => $result['code'],
+                        'info'  => $result['info'],
+                        'data'  => $result['data'],
+                    ];
+                        
+        
+        
+                } else {
+                    $results = [
+                        'code' => '103',
+                        'info'  => "Method Failed",
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Roll back the transaction in case of an exception
+                $results = [
+                    'code' => '102',
+                    'info'  => $e->getMessage(),
+                ];
+    
+            }
+        }
+        else {
+    
+            $results = [
+                'code' => '403',
+                'info'  => "Unauthorized",
+            ];
+            
+        }
+
+        return $MasterClass->Results($results);
+
+    }
     //CRUD FUNCTION
         public function saveUser(Request $request){
 
@@ -1276,6 +1431,327 @@ class JsonDataController extends Controller
                             'info'  => $status['info'],
                         ];
                             
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function actionKamar(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $id                 = $request->id;
+                        $tipe               = $request->tipe;
+                        $tipekamar          = $request->tipekamar;
+                        $no                 = $request->no;
+                        $lantai             = $request->lantai;
+                        $harga              = $request->harga;
+                        $fasilitas          = $request->fasilitas;
+                        $fasilitaspenghuni  = $request->fasilitaspenghuni;
+                        $penghuni           = $request->penghuni;
+                        $durasi             = $request->durasi;
+                        $tglawal            = null;
+                        $tglakhir           = null;
+                        if($penghuni){
+                            $tglawal        = explode(" ",$durasi)[0];
+                            $tglakhir       = explode(" ",$durasi)[2];
+                        }
+                        $now                = date('Y-m-d H:i:s');
+                        $docname            = 'kos';
+                        $idkamar            = null;
+
+                        if($tipe == 'deleted'){
+                             $where     = [
+                                 'id' => $id
+                            ];
+                            $where1     = [
+                                'id_kamar' => $id
+                            ];
+                            $deleted1      = $MasterClass->deleteGlobal('mapping_fasilitas', $where1 );
+                            $deleted2      = $MasterClass->deleteGlobal('mapping_kamar', $where1 );
+                            $deleted3      = $MasterClass->deleteGlobal('foto_kamar', $where1 );
+                            $deleted4      = $MasterClass->deleteGlobal('kamar', $where );
+                            $status        = $deleted4;
+                            $code          = $MasterClass::CODE_SUCCESS;
+                            if($deleted1['code'] != $code || $deleted2['code'] != $code 
+                            || $deleted3['code'] != $code || $deleted4['code'] != $code){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Gagal simpan data kamar",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+                        }else{
+                            
+                            $cekkamar = $MasterClass->selectGlobal("*",'kamar',"no_kamar= '$no'");
+                            if(count($cekkamar['data']) >= 1){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "No Kamar sudah tersedia",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+                            if($id){
+                                $attributes     = [
+                                    'fasilitas' => $fasilitas,
+                                    'penyedia'  => $penyedia,
+                                    'biaya'     => $biaya,
+                                ];
+                                $where     = [
+                                    'id' => $id
+                                ];
+                                $saved      = $MasterClass->updateGlobal('fasilitas', $attributes,$where );
+                                $status     = $saved;
+                            }else{
+                                // save data kamar
+                                $attrkamar     = [
+                                    'no_kamar'  => $no,
+                                    'lantai'    => $lantai,
+                                    'harga'     => $harga,
+                                    'created_at'=> $now,
+                                ];
+                                $savedkamar      = $MasterClass->saveGlobal('kamar', $attrkamar );
+                                if($savedkamar['code'] != '0'){
+                                    DB::rollBack();
+                                    $results = [
+                                        'code' => '1',
+                                        'info'  => "Gagal simpan data kamar",
+                                    ];
+                                    return $MasterClass->Results($results);
+                                }
+                                $idkamar        = $savedkamar['data'];
+                                
+                                //save mapping kamar
+                                $attrmapping     = [
+                                    'user_id'       => $penghuni,
+                                    'id_kamar'      => $idkamar,
+                                    'id_tipe'       => $tipekamar,
+                                    'tgl_awal'      => $tglawal,
+                                    'tgl_akhir'     => $tglakhir,
+                                    'created_at'    => $now,
+                                ];
+                                $savedmapping      = $MasterClass->saveGlobal('mapping_kamar', $attrmapping );
+                                if($savedmapping['code'] != $MasterClass::CODE_SUCCESS){
+                                    DB::rollBack();
+                                    $results = [
+                                        'code' => '1',
+                                        'info'  => "Gagal simpan data kamar",
+                                    ];
+                                    return $MasterClass->Results($results);
+                                }
+                                
+                                //save mapping fasilitas kos
+                                $fasilitas = explode(",",$fasilitas) ;
+                                foreach ($fasilitas as $value) {
+                                    $attrmappingfas     = [
+                                        'id_kamar'      => $idkamar,
+                                        'id_fasilitas'  => $value,
+                                        'created_at'    => $now,
+                                    ];
+                                    $savedmappingfas      = $MasterClass->saveGlobal('mapping_fasilitas', $attrmappingfas );
+                                    if($savedmappingfas['code'] != $MasterClass::CODE_SUCCESS){
+                                        DB::rollBack();
+                                        $results = [
+                                            'code' => '1',
+                                            'info'  => "Gagal simpan data kamar",
+                                        ];
+                                        return $MasterClass->Results($results);
+                                    }
+                                }
+                                //save mapping fasilitas penghuni
+                                $fasilitas = explode(",",$fasilitaspenghuni) ;
+                                foreach ($fasilitas as $value) {
+                                    $attrmappingfas     = [
+                                        'id_kamar'      => $idkamar,
+                                        'id_fasilitas'  => $value,
+                                        'created_at'    => $now,
+                                    ];
+                                    $savedmappingfas      = $MasterClass->saveGlobal('mapping_fasilitas', $attrmappingfas );
+                                    if($savedmappingfas['code'] != $MasterClass::CODE_SUCCESS){
+                                        DB::rollBack();
+                                        $results = [
+                                            'code' => '1',
+                                            'info'  => "Gagal simpan data kamar",
+                                        ];
+                                        return $MasterClass->Results($results);
+                                    }
+                                }
+
+                                //save foto kamar lainnya
+                                for ($i=0; $i < count($_FILES['filelainnya']['name']); $i++) { 
+       
+                                    $nama_file          = $_FILES['filelainnya']['name'][$i];
+                                    $type		        = $_FILES['filelainnya']['type'][$i];
+                                    $ukuran		        = $_FILES['filelainnya']['size'][$i];
+                                    $tmp_name		    = $_FILES['filelainnya']['tmp_name'][$i];
+                                    $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
+                                    $alamatfile         = '../public/data/kos/'; // directory file
+                                    $uploaddir          = $alamatfile.$nama_file_upload; // directory file
+                                    
+                                    if (move_uploaded_file($tmp_name,$uploaddir)){
+                                        chmod($uploaddir, 0777);
+
+                                        $attrphoto     = [
+                                            'id_kamar'  => $idkamar,
+                                            'file'      => $nama_file_upload,
+                                            'alamat'    => $alamatfile,
+                                            'size'      => $ukuran,
+                                            'tipe'      => $type,
+                                            'jenis'     => 'lainnya',
+                                            'created_at'=> $now,
+                                        ];
+                                        $savefoto      = $MasterClass->saveGlobal('foto_kamar', $attrphoto );
+                                        if($savefoto['code'] != $MasterClass::CODE_SUCCESS){
+                                            DB::rollBack();
+                                            $results = [
+                                                'code' => '1',
+                                                'info'  => "Gagal simpan data kamar",
+                                            ];
+                                            return $MasterClass->Results($results);
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+
+                        if($idkamar != null){// ini save
+                            DB::commit();
+                            $results = [
+                            'code'  => $MasterClass::CODE_SUCCESS,
+                            'info'  => 'ok',
+                            'data'  => $idkamar, //balikin id kamar untuk save foto sampul
+                            ];
+                        }else{// ini update & delete
+                            if($status['code'] == $MasterClass::CODE_SUCCESS){
+                                DB::commit();
+                            }else{
+                                DB::rollBack();
+                            }
+
+                            $results = [
+                                'code'  => $status['code'],
+                                'info'  => $status['info'],
+                            ];
+                        }
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function saveFileSampul(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $idkamar            = $request->idkamar;
+                        
+                        $now                = date('Y-m-d H:i:s');
+                        $docname            = 'kos';
+
+                        $nama_file          = $_FILES['form-sampul']['name'];
+                        $type		        = $_FILES['form-sampul']['type'];
+                        $ukuran		        = $_FILES['form-sampul']['size'];
+                        $tmp_name		    = $_FILES['form-sampul']['tmp_name'];
+                        $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
+                        $alamatfile         = '../public/data/kos/'; // directory file
+                        $uploaddir          = $alamatfile.$nama_file_upload; // directory file
+                        
+                        if (move_uploaded_file($tmp_name,$uploaddir)){
+                            chmod($uploaddir, 0777);
+
+                            $attrphoto     = [
+                                'id_kamar'  => $idkamar,
+                                'file'      => $nama_file_upload,
+                                'alamat'    => $alamatfile,
+                                'size'      => $ukuran,
+                                'tipe'      => $type,
+                                'jenis'     => 'sampul',
+                                'created_at'=> $now,
+                            ];
+                            $savefoto      = $MasterClass->saveGlobal('foto_kamar', $attrphoto );
+                            if($savefoto['code'] != $MasterClass::CODE_SUCCESS){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Gagal simpan data kamar",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+                        }
+
+                            
+
+                        DB::commit();
+                        $results = [
+                            'code'  => $MasterClass::CODE_SUCCESS,
+                            'info'  => 'ok',
+                        ];
             
             
                     } else {

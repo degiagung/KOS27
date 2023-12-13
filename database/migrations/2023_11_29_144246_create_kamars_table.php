@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('no_kamar')->unique();
             $table->string('lantai');
-            $table->string('status');
+            $table->string('status')->nullable();
             $table->decimal('harga', $precision = 8, $scale = 2);
             $table->timestamps();
 

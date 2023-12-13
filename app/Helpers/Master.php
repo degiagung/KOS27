@@ -206,6 +206,8 @@ class Master
                 WHERE $where
             ";
         }
+
+        // print_r($query);die;
         $select = DB::select($query);
         $select = $this->checkErrorModel($select);
 
