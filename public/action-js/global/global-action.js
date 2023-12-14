@@ -223,7 +223,150 @@ function datetostring2(p1,p2,p3){
 		return '';
 	}
 }
+function formatRupiah(angka, prefix) {
+    // var angka = angka.split(".");
+	if(angka){
+		var seeminus = angka.substr(0,1);
+		if(seeminus == '-'){
+			var minus = '-';
+			var angka = angka.substr(1).replace(/[^,\d]/g, ',');
+		}else{
+			var minus = '';
+			
+			var angka = angka.replace(/[^,\d]/g, ',');
+		}
+		var number_string = angka.toString(),
+			split = number_string.split(","),
+			sisa = split[0].length % 3,
+			rupiah = split[0].substr(0, sisa),
+			ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+		// tambahkan titik jika yang di input sudah menjadi angka ribuan
+		
+		if (ribuan) {
+			separator = sisa ? "," : "";
+			rupiah += separator + ribuan.join(",");
+		}
+	
+		rupiah = split[1] != undefined ? minus+rupiah + "." + split[1] : rupiah;
+		return prefix == undefined ? rupiah : rupiah ? "Rp " + rupiah : "";
+	}else{
+		return '';
+	}
+    
+}
 
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+function pembilang(nilai) {
+  nilai = Math.floor(Math.abs(nilai));
+ 
+  var simpanNilaiBagi = 0;
+  var huruf = [
+    '',
+    'Satu',
+    'Dua',
+    'Tiga',
+    'Empat',
+    'Lima',
+    'Enam',
+    'Tujuh',
+    'Delapan',
+    'Sembilan',
+    'Sepuluh',
+    'Sebelas',
+  ];
+  var temp = '';
+ 
+  if (nilai < 12) {
+    temp = ' ' + huruf[nilai];
+  } else if (nilai < 20) {
+    temp = pembilang(Math.floor(nilai - 10)) + ' Belas';
+  } else if (nilai < 100) {
+    simpanNilaiBagi = Math.floor(nilai / 10);
+    temp = pembilang(simpanNilaiBagi) + ' Puluh' + pembilang(nilai % 10);
+  } else if (nilai < 200) {
+    temp = ' Seratus' + pembilang(nilai - 100);
+  } else if (nilai < 1000) {
+    simpanNilaiBagi = Math.floor(nilai / 100);
+    temp = pembilang(simpanNilaiBagi) + ' Ratus' + pembilang(nilai % 100);
+  } else if (nilai < 2000) {
+    temp = ' Seribu' + pembilang(nilai - 1000);
+  } else if (nilai < 1000000) {
+    simpanNilaiBagi = Math.floor(nilai / 1000);
+    temp = pembilang(simpanNilaiBagi) + ' Ribu' + pembilang(nilai % 1000);
+  } else if (nilai < 1000000000) {
+    simpanNilaiBagi = Math.floor(nilai / 1000000);
+    temp = pembilang(simpanNilaiBagi) + ' Juta' + pembilang(nilai % 1000000);
+  } else if (nilai < 1000000000000) {
+    simpanNilaiBagi = Math.floor(nilai / 1000000000);
+    temp =
+      pembilang(simpanNilaiBagi) + ' Miliar' + pembilang(nilai % 1000000000);
+  } else if (nilai < 1000000000000000) {
+    simpanNilaiBagi = Math.floor(nilai / 1000000000000);
+    temp = pembilang(nilai / 1000000000000) + ' Triliun' + pembilang(nilai % 1000000000000);
+  }
+ 
+  return temp;
+}
+function swalsuccess(text){
+	swal({
+		icon    : "warning",
+		title   : 'Berhasil',
+		text    : text,
+		// timer	: 6000
+	});
+}
 function swalwarning(text){
 	swal({
 		icon    : "warning",

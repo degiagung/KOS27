@@ -50,17 +50,15 @@ $("#filter-btn").on('click',function(e){
 getListData();
 function getListData() {
     filtersisa = $("#filter-sisa").val() ;
-    filterstatus = $("#filter-status").val() ;
     $('#table-list').dataTable().fnClearTable();
     $('#table-list').dataTable().fnDraw();
     $('#table-list').dataTable().fnDestroy();
     dtpr = $("#table-list").DataTable({
         ajax: {
-            url: baseURL + "/listKamarDashboard",
+            url: baseURL + "/listTransaksi",
             type: "POST",
             data: {
                 sisawaktu   : filtersisa,
-                status   : filterstatus,
             },
             dataType: "json",
             dataSrc: function (response) {
@@ -141,6 +139,7 @@ function getListData() {
             },
             { data: "name" },
             { mRender: function (data, type, row) {
+                console.log(row.status_transaksi);
                     if(row.status_transaksi == null)
                     return `<a style="cursor:pointer;color:#fff;background: red;" class="showbilln" > Belum Bayar</a>`
                     else
@@ -164,9 +163,9 @@ function getListData() {
                 .on("click", function () {
                     var tr = $(this).closest("tr");
                     var rowData = dtpr.row(tr).data();
-                    if(rowData.status_transaksi != null){
+                     if(rowData.status_transaksi != null){
                         swalsuccess('Sudah Melakukan Pembayaran')
-                        return false;
+                        return false ;
                     }
                     editdata(rowData);
                 });

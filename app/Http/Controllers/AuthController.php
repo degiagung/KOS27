@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\MenusAccess;
+use App\Helpers\Master;
+
 
 class AuthController extends Controller
 {
@@ -39,10 +41,10 @@ class AuthController extends Controller
                 return redirect(route('/'));
 
             } else {
-
                 Session::put('user_id', Auth::user()->id);
                 Session::put('name', Auth::user()->name);
                 Session::put('role_id', Auth::user()->role_id);
+                Session::put('role_name',  strtolower(Auth::user()->roles->first()->role_name));
                 
                 
                 // dd(Session::get('menu'));

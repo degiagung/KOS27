@@ -47,11 +47,14 @@ class GeneralController extends Controller
             $varJs = [
                 'const baseURL = "' . $baseURL . '"',
             ];
-
+            $rolename = $MasterClass->getSession('role_name')  ;
+            
+            
             $data = [
                 'javascriptFiles' => $javascriptFiles,
                 'cssFiles' => $cssFiles,
-                'varJs'=> $varJs
+                'varJs'=> $varJs,
+                'role'=> $rolename
                 // Menambahkan base URL ke dalam array
             ];
         
@@ -310,6 +313,42 @@ class GeneralController extends Controller
             ];
         
             return view('pages.admin.property.listtipekamar')
+                ->with($data);
+        }else{
+            return redirect('/login');
+        }
+        
+    }
+    public function listtransaksi(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->AuthenticatedView($request->route()->uri());
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            $javascriptFiles = [
+                asset('action-js/global/global-action.js'),
+                // asset('action-js/generate/generate-action.js'),
+                asset('action-js/property/listtransaksi-action.js'),
+            ];
+        
+            $cssFiles = [
+                // asset('css/main.css'),
+                // asset('css/custom.css'),
+            ];
+            $baseURL = url('/');
+            $varJs = [
+                'const baseURL = "' . $baseURL . '"',
+            ];
+    
+            $data = [
+                'javascriptFiles' => $javascriptFiles,
+                'cssFiles' => $cssFiles,
+                'varJs'=> $varJs
+                 // Menambahkan base URL ke dalam array
+            ];
+        
+            return view('pages.admin.property.listtransaksi')
                 ->with($data);
         }else{
             return redirect('/login');

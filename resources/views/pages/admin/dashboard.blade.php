@@ -436,27 +436,37 @@
         <div class="row">
             <h2>Dashboard Monitoring Kamar</h2>
             <br>
-            <div class="col-lg-12">
-                 <div class="card-filter">
-                    <label style="font-size:18px;">Filter</label>
-                    <hr>
-                    <div class="row">
+            @if (Str::lower($role) == 'penjaga' || Str::lower($role) == 'superadmin')
+                <div class="col-lg-12">
+                    <div class="card-filter">
+                        <label style="font-size:18px;">Filter</label>
+                        <hr>
+                        <div class="row">
 
-                        <div class="col-sm-3">
-                            <label>Sisa Hari Sewa</label>
-                            <select id="filter-sisa" name="filter-sisa" class="select2 ">
-                                <option value="">Semua Waktu</option>
-                                <option value="<= 7"> <= 7 Hari</option>
-                                <option value="<= 3"> <= 3 Hari</option>
-                                <option value="= 0"> 1 Hari</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-2">
-                            <button type="submit" id="filter-btn" class="btn btn-sgn" style="color:#e12a2a;width:100%;height:35px;font-size:14px;margin-top: 27px;"><i class="bi bi-search" style="font-size:12px;" ></i> Cari</button>
+                            <div class="col-sm-3">
+                                <label>Sisa Hari Sewa</label>
+                                <select id="filter-sisa" name="filter-sisa" class="select2 ">
+                                    <option value="">Semua Waktu</option>
+                                    <option value="<= 7"> <= 7 Hari</option>
+                                    <option value="<= 3"> <= 3 Hari</option>
+                                    <option value="= 0"> 1 Hari</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <label>Status Bayar</label>
+                                <select id="filter-status" name="filter-status" class="select2 ">
+                                    <option value="">Semua Status</option>
+                                    <option value="0">Belum Bayar</option>
+                                    <option value="1">Sudah Bayar</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="submit" id="filter-btn" class="btn btn-sgn" style="color:#e12a2a;width:100%;height:35px;font-size:14px;margin-top: 27px;"><i class="bi bi-search" style="font-size:12px;" ></i> Cari</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div><br>
         <div class="row">
             <div class="col-lg-12">
@@ -495,68 +505,39 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div id="divbill">
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary btndownloadsert">Download PDF</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal-update">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Update Status Pembayaran</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
                     <center>
-                        <table class="bill" id="tablebill">
-                            <tr style="border-bottom: 3px solid black;">
-                                <th>Jika kunci hilang/tertinggal, langsung dikenakan biaya ganti silinder kunci baru seharga Rp. 100.000</th>
-                            </tr>
-                            <tr>
-                                {{-- <th> --}}
-                                    <th>
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                              Sudah terima dari : <b class="bold">Retta Syafira</b> <br>
-                                              Uang sejumlah : <b class="bold">Dua Juta Rupiah</b> <br>
-                                              Untuk pembayaran sewa kamar No : <b class="bold">12</b> <br>
-                                              Masa sewa dari : <b class="bold">1 juli 2023 - 1 Agustus 2023</b> <br>
-                                              Ukuran Kamar : <b class="bold">Besar</b> <br>
-                                            </div>
-                                            <div class="col-sm-6" style="font-size: 8px;">
-                                                <div style="padding-left:50px;">
-                                                    Puteri <br>
-                                                    081288748988 <br>
-                                                    <div class="col-sm-12" style="border: 3px solid black;">
-                                                        - mohon info jika ada perubahan no hp <br>
-                                                        - mohon disimpan baik-baik
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </th>
-                                    <tr>
-                                        <th>
-                                            <div class="row">
-                                                <div class="col-sm-3" style="padding-top:10px">
-                                                    <b class="bold">Rp. 2.000.000</b><br>
-                                                    Lunas Transfer BBCA
-                                                </div>
-                                                <div class="col-sm-5" style="border: 3px solid black;font-size:12px;text-align:center;"><b class="bold">
-                                                    MAHFUDZ (081220117988)<br>
-                                                    BCA 063 123 7460<br>
-                                                    Mandiri 13200 2442 7867
-                                                </b>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    Bandung, 5 September 2023<br>
-                                                    &ensp;&ensp;&ensp;<img src="{{ URL::to('/') }}/template/admin/images/ttd.jpg" style="width:100px" alt="">
-
-                                                </div>
-                                            </div>
-                                        </th>
-                                    </tr>
-                                {{-- </tr> --}}
-                                {{-- <th>Sudah terima dari : <b id="name">Retta Syafira<b></th> --}}
-                                {{-- <th>Sudah terima dari : <b id="name">Retta Syafira<b></th> --}}
-                            </tr>
-                            <tr style="border-top: 3px solid black;">
-                                <th>Penjaga kos tidak memegang kunci cadangan, mohon kunci jangan sampai tertinggal/hilang</th>
-                            </tr>
-                        </table>
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Bukti Transaksi</label>
+                            <div class="col-sm-9">
+                                <form role="form" class="" id="formbukti" method="post" type="post" enctype="multipart/form-data">
+                                    <input id="form-bukti" name="form-bukti" accept="image/*" type="file" class="form-control">
+                                </form>
+                            </div>
+                        </div>
                     </center>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="generatePDF()">Download PDF</button>
+                    <button type="button" class="btn btn-primary" id="btn-update">Simpan Bukti</button>
                 </div>
                 </div>
             </div>

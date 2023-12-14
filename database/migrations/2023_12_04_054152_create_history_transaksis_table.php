@@ -14,7 +14,16 @@ return new class extends Migration
         Schema::create('history_transaksi', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->decimal('jumlah', $precision = 18, $scale = 2);
+            $table->string('name')->nullable();
+            $table->string('handphone')->nullable();
+            $table->string('no_kamar')->nullable();
+            $table->string('fasilitas')->nullable();
+            $table->string('fasilitas_penghuni')->nullable();
+            $table->timestamp('tgl_awal')->nullable();
+            $table->timestamp('tgl_akhir')->nullable();
+            $table->decimal('biaya_kamar', $precision = 18, $scale = 2)->default(0.00);
+            $table->decimal('biaya_tambahan', $precision = 18, $scale = 2)->default(0.00);
+            $table->decimal('total_biaya', $precision = 18, $scale = 2);
             $table->timestamps();
 
             $table->foreign('user_id')

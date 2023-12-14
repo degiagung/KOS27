@@ -19,9 +19,9 @@
                             <li class=" nav-item">
                                 <a href="#navpills2-1" class="nav-link active permission-btn" data-bs-toggle="tab" aria-expanded="false">Permission Menu</a>
                             </li>
-                            <li class="nav-item">
+                            {{-- <li class="nav-item">
                                 <a href="#navpills2-2" class="nav-link jsondata-btn" data-bs-toggle="tab" aria-expanded="false">Permission JSON data</a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </div>
                     <div class="card-body">

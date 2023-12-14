@@ -626,6 +626,7 @@ class JsonDataController extends Controller
                         k.lantai,
                         k.no_kamar,
                         k.status,
+                        tk.tipe,
                         GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
                         GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp,
                         GROUP_CONCAT(fs.id SEPARATOR ',') as idfaskos,
@@ -635,6 +636,7 @@ class JsonDataController extends Controller
                             else 'Kosong'
                         END as status_kamar,
                         us.name,
+                        us.handphone,
                         mk.user_id,
                         concat(mk.tgl_awal,' SD ',mk.tgl_akhir) as durasi,
                         CONVERT(mk.tgl_awal,date) tgl_awal,
@@ -685,9 +687,11 @@ class JsonDataController extends Controller
                         k.status,
                         mk.tgl_awal,
                         us.name,
+                        us.handphone,
                         mk.tgl_awal,
                         mk.tgl_akhir,
-                        mk.user_id
+                        mk.user_id,
+                        tk.tipe
                         ORDER BY mk.tgl_akhir asc
                     ";
                     $result = $MasterClass->selectGlobal($select,$table,$where);
@@ -1052,6 +1056,129 @@ class JsonDataController extends Controller
                 if ($request->isMethod('post')) {
 
                     DB::beginTransaction();     
+                    $idlogin    = strtolower($MasterClass->getSession('user_id'));
+                    $rolelogin  = strtolower($MasterClass->getSession('role_name'));
+                    $status = [];
+                    
+                    $select = "
+                        k.id,
+                        k.lantai,
+                        k.no_kamar,
+                        GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
+                        GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp,
+                        CASE
+                            WHEN mk.tgl_awal is not null THEN 'Sudah Terisi'
+                            else 'Kosong'
+                        END as status_kamar,
+                        us.name,
+                        mk.user_id,
+                        concat(mk.tgl_awal,' SD ',mk.tgl_akhir) as durasi,
+                        mk.tgl_awal,
+                        mk.tgl_akhir,
+                        CONVERT(mk.tgl_akhir,date) - CURRENT_DATE as sisa_durasi,
+                        tk.tipe,
+                        us.handphone,
+                        sum(fsp.biaya)+k.harga as biaya,
+                        sum(fsp.biaya) as biayatambah,k.harga,
+                        ht.id as status_transaksi,
+                        ht.created_at as tgl_bayar
+                    ";
+                    
+                    $table = "
+                        kamar k
+                        LEFT JOIN mapping_kamar mk ON k.id = mk.id_kamar
+                        LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
+                        LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id
+                        LEFT JOIN tipe_kamar tk ON mk.id_tipe = tk.id
+                        LEFT JOIN users us ON mk.user_id = us.id
+                        LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id and fsp.penyedia = 'penghuni'
+                        LEFT JOIN history_transaksi ht ON ht.user_id = mk.user_id AND ht.tgl_awal = mk.tgl_awal
+                            AND ht.tgl_akhir = mk.tgl_akhir
+                    ";
+                    $where = " 
+                        mk.user_id is not null
+                    ";
+                    $sisawaktu = $request->sisawaktu ;
+                    $statusbayar = $request->status ;
+                    if($rolelogin != 'superadmin' && $rolelogin != 'penjaga'){
+                        $where  .=" AND us.id = $idlogin ";
+                    }
+                    if($sisawaktu){
+                        $where .="
+                             AND (CONVERT(mk.tgl_akhir,date) - CURRENT_DATE) >= 0 AND (CONVERT(mk.tgl_akhir,date) - CURRENT_DATE) $sisawaktu 
+                        ";
+                    }
+                    if($statusbayar == '0'){
+                        
+                        $where .=" AND ht.id is null";
+                    }elseif($statusbayar == '1'){
+                        $where .=" AND ht.id is not null";
+                    }
+                    $where .= " GROUP BY
+                        k.id,
+                        k.lantai,
+                        k.no_kamar,
+                        mk.tgl_awal,
+                        mk.user_id,
+                        us.name,
+                        mk.tgl_awal,
+                        mk.tgl_akhir,
+                        tk.tipe,
+                        us.handphone,
+                        k.harga,
+                        ht.id,
+                        ht.created_at
+                        ORDER BY mk.tgl_akhir asc
+                    ";
+
+                    // print_r($where);die;;
+                    $result = $MasterClass->selectGlobal($select,$table,$where);
+                    
+                    $results = [
+                        'code'  => $result['code'],
+                        'info'  => $result['info'],
+                        'data'  => $result['data'],
+                    ];
+                        
+        
+        
+                } else {
+                    $results = [
+                        'code' => '103',
+                        'info'  => "Method Failed",
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Roll back the transaction in case of an exception
+                $results = [
+                    'code' => '102',
+                    'info'  => $e->getMessage(),
+                ];
+    
+            }
+        }
+        else {
+    
+            $results = [
+                'code' => '403',
+                'info'  => "Unauthorized",
+            ];
+            
+        }
+
+        return $MasterClass->Results($results);
+
+    }
+    public function listTransaksi(Request $request){
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            try {
+                if ($request->isMethod('post')) {
+
+                    DB::beginTransaction();     
                     
                     $status = [];
                     
@@ -1060,25 +1187,36 @@ class JsonDataController extends Controller
                         k.lantai,
                         k.no_kamar,
                         GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
+                        GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp,
                         CASE
                             WHEN mk.tgl_awal is not null THEN 'Sudah Terisi'
                             else 'Kosong'
                         END as status_kamar,
                         us.name,
+                        mk.user_id,
                         concat(mk.tgl_awal,' SD ',mk.tgl_akhir) as durasi,
                         mk.tgl_awal,
                         mk.tgl_akhir,
-                        CONVERT(mk.tgl_akhir,date) - CURRENT_DATE as sisa_durasi
+                        CONVERT(mk.tgl_akhir,date) - CURRENT_DATE as sisa_durasi,
+                        tk.tipe,
+                        us.handphone,
+                        sum(fsp.biaya)+k.harga as biaya,
+                        sum(fsp.biaya) as biayatambah,k.harga,
+                        ht.id as status_transaksi,
+                        ht.created_at as tgl_bayar
                     ";
                     
-                    $table = '
+                    $table = "
                         kamar k
                         LEFT JOIN mapping_kamar mk ON k.id = mk.id_kamar
                         LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
                         LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id
                         LEFT JOIN tipe_kamar tk ON mk.id_tipe = tk.id
                         LEFT JOIN users us ON mk.user_id = us.id
-                    ';
+                        LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id and fsp.penyedia = 'penghuni'
+                        LEFT JOIN history_transaksi ht ON ht.user_id = mk.user_id AND ht.tgl_awal = mk.tgl_awal
+                            AND ht.tgl_akhir = mk.tgl_akhir
+                    ";
                     $where = " 
                         mk.user_id is not null
                     ";
@@ -1093,9 +1231,15 @@ class JsonDataController extends Controller
                         k.lantai,
                         k.no_kamar,
                         mk.tgl_awal,
+                        mk.user_id,
                         us.name,
                         mk.tgl_awal,
-                        mk.tgl_akhir
+                        mk.tgl_akhir,
+                        tk.tipe,
+                        us.handphone,
+                        k.harga,
+                        ht.id,
+                        ht.created_at
                         ORDER BY mk.tgl_akhir asc
                     ";
 
@@ -1740,6 +1884,129 @@ class JsonDataController extends Controller
                                 $results = [
                                     'code' => '1',
                                     'info'  => "Gagal simpan data kamar",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+                        }
+
+                            
+
+                        DB::commit();
+                        $results = [
+                            'code'  => $MasterClass::CODE_SUCCESS,
+                            'info'  => 'ok',
+                        ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function saveBukti(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $user_id            = $request->user_id;
+                        $name               = $request->name;
+                        $handphone          = $request->handphone;
+                        $no_kamar           = $request->no_kamar;
+                        $faskos             = $request->faskos;
+                        $faskosp            = $request->faskosp;
+                        $tgl_awal           = $request->tgl_awal;
+                        $tgl_akhir          = $request->tgl_akhir;
+                        $harga              = $request->harga;
+                        $biayatambah        = $request->biayatambah;
+                        $biaya              = $request->biaya;
+                         if($user_id == '' || $user_id == null || $user_id == 'undefined'){//ngebaca yg upload apakah admin / penghuni
+                            $user_id = $MasterClass->getSession('user_id') ; 
+                         }
+                        $now                = date('Y-m-d H:i:s');
+                        $docname            = 'bukti';
+
+                        $nama_file          = $_FILES['form-bukti']['name'];
+                        $type		        = $_FILES['form-bukti']['type'];
+                        $ukuran		        = $_FILES['form-bukti']['size'];
+                        $tmp_name		    = $_FILES['form-bukti']['tmp_name'];
+                        $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
+                        $alamatfile         = '../public/data/bukti/'; // directory file
+                        $uploaddir          = $alamatfile.$nama_file_upload; // directory file
+                        
+                        if (move_uploaded_file($tmp_name,$uploaddir)){
+                            chmod($uploaddir, 0777);
+
+                            $attrphoto     = [
+                                'user_id'   => $user_id,
+                                'tgl_awal'  => $tgl_awal,
+                                'tgl_akhir' => $tgl_akhir,
+                                'file'      => $nama_file_upload,
+                                'alamat'    => $alamatfile,
+                                'size'      => $ukuran,
+                                'tipe'      => $type,
+                                'jenis'     => 'bukti',
+                                'created_at'=> $now,
+                            ];
+                            $savefoto      = $MasterClass->saveGlobal('bukti_transaksi', $attrphoto );
+                            if($savefoto['code'] != $MasterClass::CODE_SUCCESS){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Gagal simpan data",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+
+                            
+                            $attrtransaksi     = [
+                                'user_id'           => $user_id,
+                                'name'              => $name,
+                                'handphone'         => $handphone,
+                                'no_kamar'          => $no_kamar,
+                                'fasilitas'         => $faskos,
+                                'fasilitas_penghuni'=> $faskosp,
+                                'tgl_awal'          => $tgl_awal,
+                                'tgl_akhir'         => $tgl_akhir,
+                                'biaya_kamar'       => $harga,
+                                'biaya_tambahan'    => $biayatambah,
+                                'total_biaya'       => $biaya,
+                                'created_at'        => $now,
+                            ];
+                            $savetransaksi      = $MasterClass->saveGlobal('history_transaksi', $attrtransaksi );
+                            if($savetransaksi['code'] != $MasterClass::CODE_SUCCESS){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Gagal simpan data",
                                 ];
                                 return $MasterClass->Results($results);
                             }
