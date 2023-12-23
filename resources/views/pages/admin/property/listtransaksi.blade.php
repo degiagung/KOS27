@@ -32,15 +32,12 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>No Kamar</th>
-                                        <th>lantai</th>
-                                        <th>Fasilitas</th>
-                                        <th>Status</th>
-                                        <th>Masa Kos</th>
-                                        <th>Durasi</th>
                                         <th>Penghuni</th>
-                                        <th>Pembayaran</th>
-                                        <th>Action</th>
+                                        <th>Handphone</th>
+                                        <th>No Kamar</th>
+                                        <th>Fasilitas</th>
+                                        <th>Masa Kos</th>
+                                        <th>Nota</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -56,7 +53,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Pembayaran</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">Nota</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

@@ -375,3 +375,10 @@ function swalwarning(text){
 		// timer	: 6000
 	});
 }
+function getMonthDifference(startDate, endDate) {
+  return (
+    endDate.getMonth() -
+    startDate.getMonth() +
+    12 * (endDate.getFullYear() - startDate.getFullYear())
+  );
+}

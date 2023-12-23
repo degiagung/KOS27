@@ -101,57 +101,32 @@ function getListData() {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 },
             },
+            { data: "name" },
+            { data: "handphone" },
             { data: "no_kamar",sClass:"td100",
                 render: function (data, type, row, meta) {
                     return 'Kamar '+row.no_kamar;
                 }, 
             },
-            { data: "lantai",sClass:"td100",
+            {sClass:"td100",
                 render: function (data, type, row, meta) {
-                    return 'Lantai '+row.lantai;
-                },
-            },
-            { data: "faskos" },
-            { data: "status_kamar",sClass:"td100",
-                mRender: function (data, type, row) {
-                    if(row.status_kamar == 'Kosong'){
-                        return `<button class="nav-link active">`+row.status_kamar+`</button>`;
-                    }else{
-                        return `<button class="btn btn-sgn">`+row.status_kamar+`</button>`;
-
-                    }
+                if(row.fasilitas_penghuni){
+                    return row.fasilitas+','+row.fasilitas_penghuni;
+                }else{
+                    return row.fasilitas;
                 }
+                }, 
             },
             { data: "durasi",sClass:"td150",
                 mRender: function (data, type, row) {
                     return window.datetostring2('yymmdd',row.tgl_awal) +'<br><b> &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;SD </b><br>'+window.datetostring2('yymmdd',row.tgl_akhir);
                 }
             },
-            { data: "sisa_durasi",
-                mRender: function (data, type, row) {
-                    if(row.sisa_durasi < 0)
-                    return `<p style="color:red;font-weight:bold;">Habis</p>`
-                    else if(row.sisa_durasi == 0)
-                    return `<p style="color:#e1e155;">Hari Terakhir</p>`;
-                    else
-                    return `<p style="color:green;">`+row.sisa_durasi+` Hari</p>`
-                }
-            },
-            { data: "name" },
             { mRender: function (data, type, row) {
-                console.log(row.status_transaksi);
-                    if(row.status_transaksi == null)
-                    return `<a style="cursor:pointer;color:#fff;background: red;" class="showbilln" > Belum Bayar</a>`
-                    else
-                    return `<a style="cursor:pointer;color:#fff;background: green;" class="showbill" > Sudah Bayar</a>`
-                }
+                return `<a style="cursor:pointer;color:red;" class="showbill" >Klik Disini</a>`
+            }
             },
-            { 
-                mRender: function (data, type, row) {
-                    var $rowData = `<button type="button" class="btn btn-primary btn-icon-sm mx-2 edit-btn"><i class="bi bi-pencil-square"></i></button>`;
-                    return $rowData;
-                },
-                className: "text-center"},
+            
         ],
         drawCallback: function (settings) {
             var api = this.api();
@@ -187,6 +162,12 @@ function getListData() {
 
 function showbill(params) {
     var masasewa = datetostring2('yymmdd',params.tgl_awal)+` - `+datetostring2('yymmdd',params.tgl_akhir) ;
+    jmlbulan = getMonthDifference(
+    new Date(params.tgl_awal), new Date(params.tgl_akhir)) + ' Bulan' ;
+    jmlbulan2 = getMonthDifference(
+    new Date(params.tgl_awal), new Date(params.tgl_akhir)) ;
+    biaya = String(params.biaya * jmlbulan2);
+    
     $(".btndownloadsert").removeAttr("onclick");
     $(".btndownloadsert").attr("onclick","generatePDF('"+params.name+"','"+masasewa+"')");
 
@@ -202,7 +183,7 @@ function showbill(params) {
                         <div class="row">
                             <div class="col-sm-6">
                                 Sudah terima dari : <b class="bold">`+params.name+`</b> <br>
-                                Uang sejumlah : <b class="bold">`+pembilang(params.biaya)+`</b> <br>
+                                Uang sejumlah : <b class="bold">`+pembilang(biaya)+`</b> <br>
                                 Untuk pembayaran sewa kamar No : <b class="bold">`+params.no_kamar+`</b> <br>
                                 Masa sewa dari : <b class="bold">`+masasewa+`</b> <br>
                                 Ukuran Kamar : <b class="bold">`+params.tipe+`</b> <br>
@@ -216,8 +197,8 @@ function showbill(params) {
                                         - mohon disimpan baik-baik
                                     </div>
                                     <br>
-                                    <b class="bold">Biaya Kamar Rp.`+formatRupiah(params.harga)+`</b><br>
-                                    <b class="bold">Fasilita Tambahan Rp. `+formatRupiah(params.biayatambah)+`</b><br>
+                                    <b class="bold">Biaya Kamar Rp.`+formatRupiah(params.harga) +` X `+jmlbulan+`</b><br>
+                                    <b class="bold">Fasilitas Tambahan Rp. `+formatRupiah(params.biayatambah)+` X `+jmlbulan+`</b><br>
                                 </div>
                             </div>
                         </div>
@@ -226,7 +207,7 @@ function showbill(params) {
                         <th>
                             <div class="row">
                                 <div class="col-sm-3" style="padding-top:10px">
-                                    <b class="bold">Rp. `+formatRupiah(params.biaya)+`</b><br>
+                                    <b class="bold">Rp. `+formatRupiah(biaya)+`</b><br>
                                     Lunas Transfer BBCA
                                 </div>
                                 <div class="col-sm-5" style="border: 3px solid black;font-size:12px;text-align:center;"><b class="bold">
@@ -290,6 +271,7 @@ function editdata(p){
 function savebukti() {
     console.log(dataedit);
     const formData    = new FormData(document.getElementById("formbukti"));
+    formData.append('idkamar',dataedit.id);
     formData.append('user_id',dataedit.user_id);
     formData.append('name',dataedit.name);
     formData.append('handphone',dataedit.handphone);
@@ -300,7 +282,8 @@ function savebukti() {
     formData.append('tgl_akhir',dataedit.tgl_akhir);
     formData.append('harga',dataedit.harga);
     formData.append('biayatambah',dataedit.biayatambah);
-    formData.append('biaya',dataedit.biaya);
+    formData.append('biaya',dataedit.biaya * getMonthDifference(
+    new Date(dataedit.tgl_awal), new Date(dataedit.tgl_akhir)));
 
     $.ajax({
         url: baseURL + "/saveBukti",

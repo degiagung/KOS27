@@ -431,6 +431,10 @@
         .bold{
             font-weight: bold !important;
         }
+
+        .masakos{
+                text-wrap: nowrap;
+        }
     </style>
     <section class="section dashboard">
         <div class="row">
@@ -448,18 +452,19 @@
                                 <select id="filter-sisa" name="filter-sisa" class="select2 ">
                                     <option value="">Semua Waktu</option>
                                     <option value="<= 7"> <= 7 Hari</option>
-                                    <option value="<= 3"> <= 3 Hari</option>
                                     <option value="= 0"> 1 Hari</option>
+                                    <option value="<= -1"> Telat</option>
+                                    <option value="<= -7"> Telat >=7 Hari </option>
                                 </select>
                             </div>
-                            <div class="col-sm-3">
+                            {{-- <div class="col-sm-3">
                                 <label>Status Bayar</label>
                                 <select id="filter-status" name="filter-status" class="select2 ">
                                     <option value="">Semua Status</option>
                                     <option value="0">Belum Bayar</option>
                                     <option value="1">Sudah Bayar</option>
                                 </select>
-                            </div>
+                            </div> --}}
                             <div class="col-sm-2">
                                 <button type="submit" id="filter-btn" class="btn btn-sgn" style="color:#e12a2a;width:100%;height:35px;font-size:14px;margin-top: 27px;"><i class="bi bi-search" style="font-size:12px;" ></i> Cari</button>
                             </div>
@@ -484,7 +489,9 @@
                                         <th>Masa Kos</th>
                                         <th>Durasi</th>
                                         <th>Penghuni</th>
-                                        <th>Pembayaran</th>
+                                        <th>Tagihan (Bulan)</th>
+                                        <th>Tagihan (Rp)</th>
+                                        <th>Status Bayar</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -531,6 +538,12 @@
                                 <form role="form" class="" id="formbukti" method="post" type="post" enctype="multipart/form-data">
                                     <input id="form-bukti" name="form-bukti" accept="image/*" type="file" class="form-control">
                                 </form>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Jml Bulan (*)</label>
+                            <div class="col-sm-9">
+                                <input id="form-bln" name="form-bln" type="number" class="form-control" min="1">
                             </div>
                         </div>
                     </center>

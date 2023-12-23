@@ -117,31 +117,45 @@ function getListData() {
             { data: "status_kamar",sClass:"td100",
                 mRender: function (data, type, row) {
                     if(row.status_kamar == 'Kosong'){
-                        return `<button class="nav-link active">`+row.status_kamar+`</button>`;
+                        return `<a style="color:green;font-weight:bold;">`+row.status_kamar+`</a>`;
                     }else{
-                        return `<button class="btn btn-sgn">`+row.status_kamar+`</button>`;
+                        return `<a style="color:red;font-weight:bold;">`+row.status_kamar+`</a>`;
 
                     }
                 }
             },
-            { data: "durasi",sClass:"td150",
+            { data: "durasi",sClass:"td150 masakos",
                 mRender: function (data, type, row) {
                     return window.datetostring2('yymmdd',row.tgl_awal) +'<br><b> &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;SD </b><br>'+window.datetostring2('yymmdd',row.tgl_akhir);
                 }
             },
             { data: "sisa_durasi",
                 mRender: function (data, type, row) {
+
                     if(row.sisa_durasi < 0)
-                    return `<p style="color:red;font-weight:bold;">Habis</p>`
+                    return `<a style="color:red;font-weight:bold;"> Telat `+row.sisa_durasi * -1+` hari</a>`
                     else if(row.sisa_durasi == 0)
-                    return `<p style="color:#e1e155;">Hari Terakhir</p>`;
+                    return `<a style="color:#e1e155;">Hari Terakhir</a>`;
                     else
-                    return `<p style="color:green;">`+row.sisa_durasi+` Hari</p>`
+                    return `<a style="color:green;">`+row.sisa_durasi+` hari</a>`
                 }
             },
             { data: "name" },
             { mRender: function (data, type, row) {
-                    if(row.status_transaksi == null)
+                return getMonthDifference(
+                    new Date(row.tgl_awal), new Date(row.tgl_akhir)
+                    ) + ' Bulan';
+                }
+            },
+            { mRender: function (data, type, row) {
+                rp = row.biaya * getMonthDifference(
+                     new Date(row.tgl_awal), new Date(row.tgl_akhir)
+                     ) ;
+                return 'Rp. '+formatRupiah(String(rp)) ;
+                    }
+            },
+            { mRender: function (data, type, row) {
+                if(row.status_transaksi == null)
                     return `<a style="cursor:pointer;color:#fff;background: red;" class="showbilln" > Belum Bayar</a>`
                     else
                     return `<a style="cursor:pointer;color:#fff;background: green;" class="showbill" > Sudah Bayar</a>`
@@ -149,10 +163,16 @@ function getListData() {
             },
             { 
                 mRender: function (data, type, row) {
-                    var $rowData = `<button type="button" class="btn btn-primary btn-icon-sm mx-2 edit-btn"><i class="bi bi-pencil-square"></i></button>`;
-                    return $rowData;
-                },
+                    
+                    if(row.status_transaksi == null)
+                    return  `<button type="button" class="btn btn-primary btn-icon-sm mx-2 edit-btn"><i class="bi bi-pencil-square"></i></button>`;
+                    else
+                    return  `<button type="button" class="btn btn-primary btn-icon-sm mx-2 showbill"><i class="bi bi-pencil-square"></i></button>`;
+                // return $rowData;
+                    
+            },
                 className: "text-center"},
+                
         ],
         drawCallback: function (settings) {
             var api = this.api();
@@ -188,6 +208,12 @@ function getListData() {
 
 function showbill(params) {
     var masasewa = datetostring2('yymmdd',params.tgl_awal)+` - `+datetostring2('yymmdd',params.tgl_akhir) ;
+    jmlbulan = getMonthDifference(
+    new Date(params.tgl_awal), new Date(params.tgl_akhir)) + ' Bulan' ;
+    jmlbulan2 = getMonthDifference(
+    new Date(params.tgl_awal), new Date(params.tgl_akhir)) ;
+    biaya = String(params.biaya * jmlbulan2);
+    
     $(".btndownloadsert").removeAttr("onclick");
     $(".btndownloadsert").attr("onclick","generatePDF('"+params.name+"','"+masasewa+"')");
 
@@ -203,7 +229,7 @@ function showbill(params) {
                         <div class="row">
                             <div class="col-sm-6">
                                 Sudah terima dari : <b class="bold">`+params.name+`</b> <br>
-                                Uang sejumlah : <b class="bold">`+pembilang(params.biaya)+`</b> <br>
+                                Uang sejumlah : <b class="bold">`+pembilang(biaya)+`</b> <br>
                                 Untuk pembayaran sewa kamar No : <b class="bold">`+params.no_kamar+`</b> <br>
                                 Masa sewa dari : <b class="bold">`+masasewa+`</b> <br>
                                 Ukuran Kamar : <b class="bold">`+params.tipe+`</b> <br>
@@ -217,8 +243,8 @@ function showbill(params) {
                                         - mohon disimpan baik-baik
                                     </div>
                                     <br>
-                                    <b class="bold">Biaya Kamar Rp.`+formatRupiah(params.harga)+`</b><br>
-                                    <b class="bold">Fasilita Tambahan Rp. `+formatRupiah(params.biayatambah)+`</b><br>
+                                    <b class="bold">Biaya Kamar Rp.`+formatRupiah(params.harga) +` X `+jmlbulan+`</b><br>
+                                    <b class="bold">Fasilitas Tambahan Rp. `+formatRupiah(params.biayatambah)+` X `+jmlbulan+`</b><br>
                                 </div>
                             </div>
                         </div>
@@ -227,7 +253,7 @@ function showbill(params) {
                         <th>
                             <div class="row">
                                 <div class="col-sm-3" style="padding-top:10px">
-                                    <b class="bold">Rp. `+formatRupiah(params.biaya)+`</b><br>
+                                    <b class="bold">Rp. `+formatRupiah(biaya)+`</b><br>
                                     Lunas Transfer BBCA
                                 </div>
                                 <div class="col-sm-5" style="border: 3px solid black;font-size:12px;text-align:center;"><b class="bold">
@@ -289,8 +315,17 @@ function editdata(p){
 }
 
 function savebukti() {
-    console.log(dataedit);
+    let jmlbulan    = $("#form-bln").val() ; 
+    if($("#form-bukti").val() == ''){
+        swalwarning('Bukti tidak boleh kosong');
+        return false ;
+    }
+    if(jmlbulan <= 0){
+        swalwarning('Jumlah Bulan minimal 1 bulan');
+        return false ;
+    }
     const formData    = new FormData(document.getElementById("formbukti"));
+    formData.append('idkamar',dataedit.id);
     formData.append('user_id',dataedit.user_id);
     formData.append('name',dataedit.name);
     formData.append('handphone',dataedit.handphone);
@@ -298,10 +333,11 @@ function savebukti() {
     formData.append('faskos',dataedit.faskos);
     formData.append('faskosp',dataedit.faskosp);
     formData.append('tgl_awal',dataedit.tgl_awal);
-    formData.append('tgl_akhir',dataedit.tgl_akhir);
+    formData.append('tipe_kamar',dataedit.tipe);
     formData.append('harga',dataedit.harga);
     formData.append('biayatambah',dataedit.biayatambah);
-    formData.append('biaya',dataedit.biaya);
+    formData.append('jmlbulan',jmlbulan);
+    formData.append('biaya',dataedit.biaya * jmlbulan);
 
     $.ajax({
         url: baseURL + "/saveBukti",

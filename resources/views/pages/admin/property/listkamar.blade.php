@@ -54,7 +54,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="table-list" class="table datatables">
+                            <table id="table-list" class="table datatables table-bordered table-lg">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -82,40 +82,65 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header headermodal">
-                        <h5 class="modal-title">Data View</h5>
+                        <h5 class="modal-title">Tambah Data</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal">
                         </button>
                     </div>
                     
                     <div class="modal-body">
                         <div class="basic-form">
+                            <div class="mb-3 row fotokamar" style-"display:none;">
+                                {{-- <div class="col-sm-3 fotosampul">
+                                    
+                                </div> --}}
+                                <div class="col-sm-3 fotolainnya">
+                                    <label>Foto Lainnya</label>
+                                    <img src="../template/admin/images/ttd.jpg" style="width:100px;height:50px;" alt="">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label>Foto Lainnya</label>
+                                    <img src="../template/admin/images/ttd.jpg" style="width:100px;height:50px;" alt="">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label>Foto Lainnya</label>
+                                    <img src="../template/admin/images/ttd.jpg" style="width:100px;height:50px;" alt="">
+                                </div>
+                            </div>
+                            <div class="mb-3 row perbaikan" style="display:none">
+                                <label class="col-sm-3 col-form-label">Perbaikan</label>
+                                <div class="col-sm-9">
+                                    <select class="select2add" name="states[]" multiple="multiple" id="form-fasilitas-perbaikan" name="form-fasilitas-perbaikan"> 
+
+                                    </select>
+                                </div>
+                            </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">no kamar</label>
+                                <label class="col-sm-3 col-form-label">no kamar (*)</label>
                                 <div class="col-sm-9">
                                     <input id="form-no" name="form-no" type="text" class="form-control" placeholder="No Kamar">
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Lantai</label>
+                                <label class="col-sm-3 col-form-label">Lantai (*)</label>
                                 <div class="col-sm-9">
                                     <input id="form-lantai" name="form-lantai" type="number" class="form-control" placeholder="Lantai">
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Tipe Kamar</label>
+                                <label class="col-sm-3 col-form-label">Tipe Kamar (*)</label>
                                 <div class="col-sm-9">
                                     <select id="form-tipekamar" name="form-tipekamar">
                                     </select>
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Harga Sewa</label>
+                                <label class="col-sm-3 col-form-label">Harga Sewa (*)</label>
                                 <div class="col-sm-9">
                                     <input id="form-harga" name="form-harga" type="number" class="form-control" placeholder="Harga">
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Fasilitas Dari Kos</label>
+                                <label class="col-sm-3 col-form-label">Fasilitas Dari Kos (*)</label>
                                 <div class="col-sm-9">
                                     <select class="select2add" name="states[]" multiple="multiple" id="form-fasilitas" name="form-fasilitas"> 
 
@@ -123,15 +148,7 @@
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Fasilitas Dari Penghuni</label>
-                                <div class="col-sm-9">
-                                    <select class="select2add" name="states[]" multiple="multiple" id="form-fasilitas-penghuni" name="form-fasilitas">
-
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Foto Sampul</label>
+                                <label class="col-sm-3 col-form-label">Foto Sampul (*)</label>
                                 <div class="col-sm-9">
                                     <form role="form" class="" id="formsample" method="post" type="post" enctype="multipart/form-data">
                                         <input id="form-sampul" name="form-sampul" accept="image/*" type="file" class="form-control" name="foto-sampul">
@@ -154,10 +171,28 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="mb-3 row durasi" style="display: none">
-                                <label class="col-sm-3 col-form-label">Durasi Kos</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control daterange-time" name="datetimes" id="form-durasi"> 
+                            
+                            <div class="durasi" style="display: none">
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Fasilitas Dari Penghuni</label>
+                                    <div class="col-sm-9">
+                                        <select class="select2add" name="states[]" multiple="multiple" id="form-fasilitas-penghuni" name="form-fasilitas">
+    
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row" >
+                                    <label class="col-sm-3 col-form-label">Tanggal Kos</label>
+                                    <div class="col-sm-9">
+                                        {{-- <input type="text" class="form-control daterange-time" name="datetimes" id="form-durasi">  --}}
+                                        <input type="date" class="form-control" name="datetimes" id="form-durasi"> 
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Jml Bulan (*)</label>
+                                    <div class="col-sm-9">
+                                        <input id="form-bln" name="form-bln" type="number" class="form-control" min="1">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -169,6 +204,7 @@
                 </div>
             </div>
         </div>
+        
     </section>
 @endsection
 @push('after-script')

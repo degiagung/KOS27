@@ -95,39 +95,53 @@ function getListData() {
                     return 'Lantai '+row.lantai;
                 },
             },
-            { data: "faskos" },
+            { data: "faskos",mRender: function (data, type, row) {
+                if(row.faskosp){
+                    return row.faskos+','+row.faskosp;
+                }else{
+                    return row.faskos;
+                }
+            } },
             { data: "status_kamar",sClass:"td100",
                 mRender: function (data, type, row) {
                     if(row.status_kamar == 'Kosong'){
-                        return `<button class="nav-link active">`+row.status_kamar+`</button>`;
+                        return `<a style="color:green;font-weight:bold;">`+row.status_kamar+`</a>`;
                     }else{
-                        return `<button class="btn btn-sgn">`+row.status_kamar+`</button>`;
+                        return `<a style="color:red;font-weight:bold;">`+row.status_kamar+`</a>`;
 
                     }
                 }
             },
             { data: "durasi",sClass:"td200",
                 mRender: function (data, type, row) {
-                    return window.datetostring2('yymmdd',row.tgl_awal) +'<br><b> &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;SD </b><br>'+window.datetostring2('yymmdd',row.tgl_akhir);
+                    if(row.name){
+                        return window.datetostring2('yymmdd',row.tgl_awal) +'<br><b> &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;SD </b><br>'+window.datetostring2('yymmdd',row.tgl_akhir);
+                    }else{
+                        return '';
+                    }
                 }
             },
             { data: "sisa_durasi",
                 mRender: function (data, type, row) {
-                    if(row.sisa_durasi < 0)
-                    return `<p style="color:red;font-weight:bold;">Habis</p>`
-                    else if(row.sisa_durasi == 0)
-                    return `<p style="color:#e1e155;">Hari Terakhir</p>`;
-                    else
-                    return `<p style="color:green;">`+row.sisa_durasi+` Hari</p>`
+                    if(row.name){
+                        if(row.sisa_durasi < 0)
+                        return `<a style="color:red;font-weight:bold;"> Telat `+row.sisa_durasi * -1+` hari</a>`
+                        else if(row.sisa_durasi == 0)
+                        return `<a style="color:#e1e155;">Hari Terakhir</a>`;
+                        else
+                        return `<a style="color:green;">`+row.sisa_durasi+` hari</a>`
+                    }else{
+                        return '';
+                    }
                 }
             },
             { data: "name" },
             { data: "k.status",
                 mRender: function (data, type, row) {
-                    if(row.status != 'perbaikan')
-                    return 'fasilitas baik'
+                    if(row.idperbaikan)
+                    return '<a style="color:red;font-weight:bold;">perbaikan</a>'
                     else
-                    return 'perbaikan fasilitas'
+                    return '<a style="color:green;font-weight:bold;">baik</a>'
                 }
             },
             { 
@@ -164,25 +178,93 @@ function getListData() {
 let isObject = {};
 
 function editdata(rowData) {
+    
+    fotokamar(rowData.id)
+    loadfasilitas('kos','fasilitas-perbaikan',rowData.id);
+    $(".perbaikan").show();
     isObject = {};
     isObject = rowData;
-    $('#formkamar input').val('');
+    isObject['tipe'] = 'update';
     $('#formkamar select').val('').trigger('change');
+    $('#formkamar input').val('');
     $("#form-no").val(rowData.no_kamar);
     $("#form-lantai").val(rowData.lantai);
     $("#form-tipe").val(rowData.tipe).trigger('change');;
     $("#form-harga").val(rowData.harga);
     $("#form-penghuni").val(rowData.user_id).trigger('change');
-    $("#form-durasi").val(rowData.tgl_awal+" - "+rowData.tgl_akhir);
-
-    var idfaskos=rowData.idfaskos;
-    $.each(idfaskos.split(","), function(i,e){
-        // $("#form-fasilitas option[value='" + e + "']").prop("selected", true);
-    });
+    $("#form-durasi").val(rowData.tgl_awal);
+    $("#form-bln").val(getMonthDifference(new Date(rowData.tgl_awal), new Date(rowData.tgl_akhir)));
+   
+    const idfaskos=rowData.idfaskos;
+    const idfaskosp=rowData.idfaskosp;
+    const idperbaikan=rowData.idperbaikan;
+    const faskos = [];
+    const faskosp = [];
+    const fasper = [];
+    if(idfaskos){
+        $.each(idfaskos.split(","), function(i,e){
+            faskos.push(e);    
+        });
+        $("#form-fasilitas").val(faskos).trigger('change');
+    }
+    if(idfaskosp){
+        $.each(idfaskosp.split(","), function(i,e){
+            faskosp.push(e);
+        });
+        $("#form-fasilitas-penghuni").val(faskosp).trigger('change')
+    }
+    // console.log(idperbaikan)
+    setTimeout(() => {
+        if(idperbaikan){
+            $.each(idperbaikan.split(","), function(i,e){
+                fasper.push(e);
+            });
+            $("#form-fasilitas-perbaikan").val(fasper).trigger('change')
+        }
+    }, 2000);
     $("#modal-data").modal("show");
+
+
+}
+
+function fotokamar(id){
+    $(".fotokamar").empty();
+    $.ajax({
+    type: 'POST',
+    dataType: 'json',
+    url: baseURL + '/getfotokamar',
+    data: {
+        id    : id,
+
+    }, success: function(result){
+        $(".fotokamar").show();
+        var content = '';
+        $.each(result.data, function(i,e){
+            file = baseURL+e['alamat'].replaceAll('../public','')+e['file'];
+            if(e['jenis'] == 'sampul'){
+                content +=`<div class="col-sm-3">
+                <label>Foto Sampul</label>
+                <img src="`+file+`" style="width:100px;height:50px;" alt="">
+                </div>
+                `;
+            }else{
+                content += `
+                    <div class="col-sm-3">
+                        <label>Foto Lainnya</label>
+                        <img src="`+file+`" style="width:100px;height:50px;" alt="">
+                    </div>
+                    `
+                
+            }
+        });
+        $(".fotokamar").append(content);
+    }
+    });
 }
 
 $("#add-btn").on("click", function (e) {
+    $(".fotokamar").hide();
+    $(".perbaikan").hide();
     e.preventDefault();
 
     $('#formkamar input').val('');
@@ -190,6 +272,7 @@ $("#add-btn").on("click", function (e) {
 
     isObject = {};
     isObject["id"] = null;
+    isObject["tipe"] = '';
     $("#modal-data").modal("show");
 });
 
@@ -244,23 +327,32 @@ function checkValidation() {
         )
     )
         return false;
-    if (
-        validationSwalFailed(
-            ($("#form-sampul").val()),
-            "Foto Sampul Kamar tidak boleh kosong"
+    if(isObject['tipe'] == ''){
+        if (
+            validationSwalFailed(
+                ($("#form-sampul").val()),
+                "Foto Sampul Kamar tidak boleh kosong"
+            )
         )
-    )
-        return false;
+            return false;
+    }
         
     if($("#form-penghuni").val()){
         if (
             validationSwalFailed(
                 ($("#form-durasi").val()),
-                "Durasi Kos tidak boleh kosong"
+                "Tanggal Kos tidak boleh kosong"
             )
         )
             return false;
+            
+    let jmlbulan    = $("#form-bln").val() ; 
+    if(jmlbulan <= 0){
+            swalwarning('Jumlah Bulan minimal 1 bulan');
+            return false ;
+        }
     }
+    
     saveData();
 }
 
@@ -319,18 +411,22 @@ function deleteData(data) {
         }
     });
 }
+
 function saveData() {
     const formData    = new FormData(document.getElementById("formfilelainnya"));
-    formData.append('tipe','');
+    formData.append('tipe',isObject['tipe']);
+    formData.append('id',isObject['id']);
+    formData.append('noold',isObject['no_kamar']);
     formData.append('no',$('#form-no').val());
     formData.append('lantai',$('#form-lantai').val());
     formData.append('tipekamar',$('#form-tipekamar').val());
     formData.append('harga',$('#form-harga').val());
     formData.append('fasilitas',$('#form-fasilitas').val());
     formData.append('fasilitaspenghuni',$('#form-fasilitas-penghuni').val());
+    formData.append('fasilitasperbaikan',$('#form-fasilitas-perbaikan').val());
     formData.append('penghuni',$('#form-penghuni').val());
     formData.append('durasi',$('#form-durasi').val());
-
+    formData.append('jmlbulan',$('#form-bln').val());
 
     $.ajax({
         url: baseURL + "/actionKamar",
@@ -457,7 +553,7 @@ async function loadtipe() {
     }
 }
 
-async function loadfasilitas(jenis,id) {
+async function loadfasilitas(jenis,id,kamar) {
     try {
         $("#form-"+id).empty();
         const response = await $.ajax({
@@ -465,7 +561,8 @@ async function loadfasilitas(jenis,id) {
             type: "POST",
             dataType: "json",
             data:{
-                jenis : jenis
+                jenis : jenis,
+                kamar:kamar
             }
         });
 

@@ -4,7 +4,10 @@ let dtpr;
 
 $(document).ready(function () {
     getListData();
-    $('.select2').select2();
+    // $('.select2').select2();
+    $(".select2").select2({
+        dropdownParent: $(".modal"),
+    });
 });
 
 
