@@ -1092,14 +1092,24 @@ class JsonDataController extends Controller
                         sum(fsp.biaya)+k.harga as biaya,
                         sum(fsp.biaya) as biayatambah,k.harga,
                         ht.id as status_transaksi,
-                        ht.created_at as tgl_bayar
+                        ht.created_at as tgltransaksi,
+                        ht.total_biaya totaltransaksi,
+                        ht.tgl_awal tgltransaksi1,
+                        ht.tgl_akhir tgltransaksi2,
+                        ht.name nametransaksi,
+                        ht.biaya_kamar biayatransaksi,
+                        ht.biaya_tambahan biayatambahtransaksi,
+                        ht.tipe tipetransaksi,
+                        ht.no_kamar kamartransaksi,
+                        ht.jml_bulan blntransaksi,
+                        ht.handphone hptranaksi
                     ";
                     
                     $table = "
                         kamar k
                         LEFT JOIN mapping_kamar mk ON k.id = mk.id_kamar
                         LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
-                        LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id
+                        LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id and fs.penyedia = 'pihak kos'
                         LEFT JOIN tipe_kamar tk ON mk.id_tipe = tk.id
                         LEFT JOIN users us ON mk.user_id = us.id
                         LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id and fsp.penyedia = 'penghuni'
@@ -1111,7 +1121,7 @@ class JsonDataController extends Controller
                     ";
                     $sisawaktu = $request->sisawaktu ;
                     $statusbayar = $request->status ;
-                    if($rolelogin != 'superadmin' && $rolelogin != 'penjaga'){
+                    if($rolelogin != 'superadmin' && $rolelogin != 'penjaga' && $rolelogin != 'pemilik'){
                         $where  .=" AND us.id = $idlogin ";
                     }
                     if($sisawaktu){
@@ -1138,7 +1148,17 @@ class JsonDataController extends Controller
                         us.handphone,
                         k.harga,
                         ht.id,
-                        ht.created_at
+                        ht.created_at,
+                        ht.total_biaya,
+                        ht.tgl_awal,
+                        ht.tgl_akhir,
+                        ht.name,
+                        ht.biaya_kamar,
+                        ht.biaya_tambahan,
+                        ht.tipe,
+                        ht.no_kamar,
+                        ht.jml_bulan,
+                        ht.handphone
                         ORDER BY mk.tgl_akhir asc
                     ";
 
@@ -1189,6 +1209,10 @@ class JsonDataController extends Controller
             try {
                 if ($request->isMethod('post')) {
 
+                    
+                    $idlogin    = strtolower($MasterClass->getSession('user_id'));
+                    $rolelogin  = strtolower($MasterClass->getSession('role_name'));
+                    
                     DB::beginTransaction();     
                     
                     $status = [];
@@ -1201,11 +1225,15 @@ class JsonDataController extends Controller
                        history_transaksi ht
                     ";
                     $where = " 
-                        mk.user_id is not null order by created_at desc
+                        ht.user_id is not null 
                     ";
-                    
-                    // print_r($where);die;;
-                    $result = $MasterClass->selectGlobal($select,$table);
+                    if($rolelogin != 'superadmin' && $rolelogin != 'penjaga' && $rolelogin != 'pemilik'){
+                        $where  .=" AND ht.user_id = $idlogin ";
+                    }
+                    $where .= " 
+                    order by created_at desc
+                    ";
+                    $result = $MasterClass->selectGlobal($select,$table,$where);
                     
                     $results = [
                         'code'  => $result['code'],

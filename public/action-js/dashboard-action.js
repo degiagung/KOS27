@@ -113,7 +113,15 @@ function getListData() {
                     return 'Lantai '+row.lantai;
                 },
             },
-            { data: "faskos" },
+            {sClass:"td100",
+                render: function (data, type, row, meta) {
+                if(row.faskosp){
+                    return row.faskos+','+row.faskosp;
+                }else{
+                    return row.faskos;
+                }
+                }, 
+            },
             { data: "status_kamar",sClass:"td100",
                 mRender: function (data, type, row) {
                     if(row.status_kamar == 'Kosong'){
@@ -171,7 +179,7 @@ function getListData() {
                 // return $rowData;
                     
             },
-                className: "text-center"},
+                className: "text-center notdown action",visible:false},
                 
         ],
         drawCallback: function (settings) {
@@ -204,18 +212,22 @@ function getListData() {
                 });
         },
     });
+
+    var action     = dtpr.columns(".action");
+    if(role == 'superadmin'){
+        action.visible(true)  ;
+    }
+    else{
+        action.visible(false)  ;
+    }
 }
 
 function showbill(params) {
-    var masasewa = datetostring2('yymmdd',params.tgl_awal)+` - `+datetostring2('yymmdd',params.tgl_akhir) ;
-    jmlbulan = getMonthDifference(
-    new Date(params.tgl_awal), new Date(params.tgl_akhir)) + ' Bulan' ;
-    jmlbulan2 = getMonthDifference(
-    new Date(params.tgl_awal), new Date(params.tgl_akhir)) ;
-    biaya = String(params.biaya * jmlbulan2);
+    var masasewa = datetostring2('yymmdd',params.tgltransaksi1)+` - `+datetostring2('yymmdd',params.tgltransaksi2) ;
+    jmlbulan = params.blntransaksi + ' Bulan' ;
     
     $(".btndownloadsert").removeAttr("onclick");
-    $(".btndownloadsert").attr("onclick","generatePDF('"+params.name+"','"+masasewa+"')");
+    $(".btndownloadsert").attr("onclick","generatePDF('"+params.nametransaksi+"','"+masasewa+"')");
 
     $("#divbill").empty();
     $("#divbill").append(`
@@ -228,23 +240,23 @@ function showbill(params) {
                     <th>
                         <div class="row">
                             <div class="col-sm-6">
-                                Sudah terima dari : <b class="bold">`+params.name+`</b> <br>
-                                Uang sejumlah : <b class="bold">`+pembilang(biaya)+`</b> <br>
-                                Untuk pembayaran sewa kamar No : <b class="bold">`+params.no_kamar+`</b> <br>
+                                Sudah terima dari : <b class="bold">`+params.nametransaksi+`</b> <br>
+                                Uang sejumlah : <b class="bold">`+pembilang(params.totaltransaksi)+`</b> <br>
+                                Untuk pembayaran sewa kamar No : <b class="bold">`+params.kamartransaksi+`</b> <br>
                                 Masa sewa dari : <b class="bold">`+masasewa+`</b> <br>
-                                Ukuran Kamar : <b class="bold">`+params.tipe+`</b> <br>
+                                Ukuran Kamar : <b class="bold">`+params.tipetransaksi+`</b> <br>
                             </div>
                             <div class="col-sm-6" style="font-size: 8px;">
                                 <div style="padding-left:50px;">
                                     Puteri <br>
-                                    `+params.handphone+` <br>
+                                    `+params.hptranaksi+` <br>
                                     <div class="col-sm-12" style="border: 3px solid black;">
                                         - mohon info jika ada perubahan no hp <br>
                                         - mohon disimpan baik-baik
                                     </div>
                                     <br>
-                                    <b class="bold">Biaya Kamar Rp.`+formatRupiah(params.harga) +` X `+jmlbulan+`</b><br>
-                                    <b class="bold">Fasilitas Tambahan Rp. `+formatRupiah(params.biayatambah)+` X `+jmlbulan+`</b><br>
+                                    <b class="bold">Biaya Kamar Rp.`+formatRupiah(params.biayatransaksi) +` X `+jmlbulan+`</b><br>
+                                    <b class="bold">Fasilitas Tambahan Rp. `+formatRupiah(params.biayatambahtransaksi)+` X `+jmlbulan+`</b><br>
                                 </div>
                             </div>
                         </div>
@@ -253,7 +265,7 @@ function showbill(params) {
                         <th>
                             <div class="row">
                                 <div class="col-sm-3" style="padding-top:10px">
-                                    <b class="bold">Rp. `+formatRupiah(biaya)+`</b><br>
+                                    <b class="bold">Rp. `+formatRupiah(params.totaltransaksi)+`</b><br>
                                     Lunas Transfer BBCA
                                 </div>
                                 <div class="col-sm-5" style="border: 3px solid black;font-size:12px;text-align:center;"><b class="bold">
@@ -263,7 +275,7 @@ function showbill(params) {
                                 </b>
                                 </div>
                                 <div class="col-sm-4">
-                                    Bandung, `+datetostring2('yymmdd',params.tgl_bayar)+`<br>
+                                    Bandung, `+datetostring2('yymmdd',params.tgltransaksi)+`<br>
                                     &ensp;&ensp;&ensp;<img src="`+baseURL+`/template/admin/images/ttd.jpg" style="width:100px" alt="">
 
                                 </div>

@@ -209,7 +209,7 @@ class Master
             ";
         }
 
-        // print_r($query);die;
+        // dd($query);
         $select = DB::select($query);
         $select = $this->checkErrorModel($select);
 

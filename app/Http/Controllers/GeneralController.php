@@ -36,7 +36,7 @@ class GeneralController extends Controller
            
             $javascriptFiles = [
                 asset('action-js/global/global-action.js'),
-                asset('action-js/dashboard-action.js'),
+                // asset('action-js/dashboard-action.js'),
             ];
         
             $cssFiles = [
@@ -44,17 +44,19 @@ class GeneralController extends Controller
                 // asset('css/custom.css'),
             ];
             $baseURL = url('/');
+            $rolename = strtolower($MasterClass->getSession('role_name'))  ;
             $varJs = [
                 'const baseURL = "' . $baseURL . '"',
+                'const role = "' . $rolename . '"',
+
             ];
-            $rolename = $MasterClass->getSession('role_name')  ;
             
             
             $data = [
                 'javascriptFiles' => $javascriptFiles,
                 'cssFiles' => $cssFiles,
                 'varJs'=> $varJs,
-                'role'=> $rolename
+                'role'=> $rolename,
                 // Menambahkan base URL ke dalam array
             ];
         
@@ -193,14 +195,16 @@ class GeneralController extends Controller
                 // asset('css/custom.css'),
             ];
             $baseURL = url('/');
+            $rolename = strtolower($MasterClass->getSession('role_name'))  ;
             $varJs = [
                 'const baseURL = "' . $baseURL . '"',
+                'const role = "' . $rolename .'"',
+
             ];
-    
             $data = [
                 'javascriptFiles' => $javascriptFiles,
                 'cssFiles' => $cssFiles,
-                'varJs'=> $varJs
+                'varJs'=> $varJs,
                  // Menambahkan base URL ke dalam array
             ];
         

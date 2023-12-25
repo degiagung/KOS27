@@ -1,7 +1,10 @@
 let dtpr;
 
 $(document).ready(function () {
-
+    
+    if(role == 'pemilik' || role == 'superadmin'){
+        $(".divutkpmilik").show();
+    }
     loadfasilitas('kos','fasilitas');
     loadfasilitas('penghuni','fasilitas-penghuni');
     loadtipe();
@@ -146,11 +149,13 @@ function getListData() {
             },
             { 
                 mRender: function (data, type, row) {
-                    var $rowData = `<button type="button" class="btn btn-primary btn-icon-sm mx-2 edit-btn"><i class="bi bi-pencil-square"></i></button>`;
-                    $rowData += `<button type="button" class="btn btn-danger btn-icon-sm delete-btn"><i class="bi bi-x-square"></i></button>`;
-                    return $rowData;
+                    // if(role == 'superadmin'){
+                        var $rowData = `<button type="button" class="btn btn-primary btn-icon-sm mx-2 edit-btn"><i class="bi bi-pencil-square"></i></button>`;
+                        $rowData += `<button type="button" class="btn btn-danger btn-icon-sm delete-btn"><i class="bi bi-x-square"></i></button>`;
+                        return $rowData;
+                    // }
                 },
-                className: "text-center"},
+                className: "text-center notdown"},
         ],
         drawCallback: function (settings) {
             var api = this.api();
@@ -172,7 +177,11 @@ function getListData() {
                     deleteData(rowData);
                 });
         },
-    });
+        
+    }
+    );
+
+
 }
 
 let isObject = {};

@@ -64,9 +64,7 @@ function getListData() {
                     $rowData += `<button type="button" class="btn btn-danger btn-icon-sm delete-btn"><i class="bi bi-x-square"></i></button>`;
                     return $rowData;
                 },
-                visible: true,
-                targets: 5,
-                className: "text-center"},
+                className: "text-center notdown action"},
         ],
         drawCallback: function (settings) {
             var api = this.api();

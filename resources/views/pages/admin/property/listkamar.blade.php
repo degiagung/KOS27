@@ -42,7 +42,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header mt-2 flex-wrap d-flex justify-content-between">
+                    <div class="card-header mt-2 flex-wrap d-flex justify-content-between divutkpmilik" style="display:none !important;">
                         {{-- <div>
                             <h4 class="card-title">List Kamar</h4>
                         </div> --}}
@@ -114,87 +114,91 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">no kamar (*)</label>
-                                <div class="col-sm-9">
-                                    <input id="form-no" name="form-no" type="text" class="form-control" placeholder="No Kamar">
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Lantai (*)</label>
-                                <div class="col-sm-9">
-                                    <input id="form-lantai" name="form-lantai" type="number" class="form-control" placeholder="Lantai">
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Tipe Kamar (*)</label>
-                                <div class="col-sm-9">
-                                    <select id="form-tipekamar" name="form-tipekamar">
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Harga Sewa (*)</label>
-                                <div class="col-sm-9">
-                                    <input id="form-harga" name="form-harga" type="number" class="form-control" placeholder="Harga">
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Fasilitas Dari Kos (*)</label>
-                                <div class="col-sm-9">
-                                    <select class="select2add" name="states[]" multiple="multiple" id="form-fasilitas" name="form-fasilitas"> 
+                            <div class="divutkpmilik" style="display:none">
 
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Foto Sampul (*)</label>
-                                <div class="col-sm-9">
-                                    <form role="form" class="" id="formsample" method="post" type="post" enctype="multipart/form-data">
-                                        <input id="form-sampul" name="form-sampul" accept="image/*" type="file" class="form-control" name="foto-sampul">
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Foto Lainnya</label>
-                                <div class="col-sm-9">
-                                    <form role="form" class="" id="formfilelainnya" method="post" type="post" enctype="multipart/form-data">
-                                        <input class="form-control" name="filelainnya[]" id="form-lainnya" type="file" value="" multiple style="opacity:1;"/>
-                                    </form>
-                                    </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label">Penghuni</label>
-                                <div class="col-sm-9">
-                                    <select id="form-penghuni" name="form-penghuni" class="select2add">
-
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="durasi" style="display: none">
                                 <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Fasilitas Dari Penghuni</label>
+                                    <label class="col-sm-3 col-form-label">no kamar (*)</label>
                                     <div class="col-sm-9">
-                                        <select class="select2add" name="states[]" multiple="multiple" id="form-fasilitas-penghuni" name="form-fasilitas">
+                                        <input id="form-no" name="form-no" type="text" class="form-control" placeholder="No Kamar">
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Lantai (*)</label>
+                                    <div class="col-sm-9">
+                                        <input id="form-lantai" name="form-lantai" type="number" class="form-control" placeholder="Lantai">
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Tipe Kamar (*)</label>
+                                    <div class="col-sm-9">
+                                        <select id="form-tipekamar" name="form-tipekamar">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Harga Sewa (*)</label>
+                                    <div class="col-sm-9">
+                                        <input id="form-harga" name="form-harga" type="number" class="form-control" placeholder="Harga">
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Fasilitas Dari Kos (*)</label>
+                                    <div class="col-sm-9">
+                                        <select class="select2add" name="states[]" multiple="multiple" id="form-fasilitas" name="form-fasilitas"> 
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Foto Sampul (*)</label>
+                                    <div class="col-sm-9">
+                                        <form role="form" class="" id="formsample" method="post" type="post" enctype="multipart/form-data">
+                                            <input id="form-sampul" name="form-sampul" accept="image/*" type="file" class="form-control" name="foto-sampul">
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Foto Lainnya</label>
+                                    <div class="col-sm-9">
+                                        <form role="form" class="" id="formfilelainnya" method="post" type="post" enctype="multipart/form-data">
+                                            <input class="form-control" name="filelainnya[]" id="form-lainnya" type="file" value="" multiple style="opacity:1;"/>
+                                        </form>
+                                        </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Penghuni</label>
+                                    <div class="col-sm-9">
+                                        <select id="form-penghuni" name="form-penghuni" class="select2add">
     
                                         </select>
                                     </div>
                                 </div>
-                                <div class="mb-3 row" >
-                                    <label class="col-sm-3 col-form-label">Tanggal Kos</label>
-                                    <div class="col-sm-9">
-                                        {{-- <input type="text" class="form-control daterange-time" name="datetimes" id="form-durasi">  --}}
-                                        <input type="date" class="form-control" name="datetimes" id="form-durasi"> 
+                                
+                                <div class="durasi" style="display: none">
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">Fasilitas Dari Penghuni</label>
+                                        <div class="col-sm-9">
+                                            <select class="select2add" name="states[]" multiple="multiple" id="form-fasilitas-penghuni" name="form-fasilitas">
+        
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Jml Bulan (*)</label>
-                                    <div class="col-sm-9">
-                                        <input id="form-bln" name="form-bln" type="number" class="form-control" min="1">
+                                    <div class="mb-3 row" >
+                                        <label class="col-sm-3 col-form-label">Tanggal Kos</label>
+                                        <div class="col-sm-9">
+                                            {{-- <input type="text" class="form-control daterange-time" name="datetimes" id="form-durasi">  --}}
+                                            <input type="date" class="form-control" name="datetimes" id="form-durasi"> 
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">Jml Bulan (*)</label>
+                                        <div class="col-sm-9">
+                                            <input id="form-bln" name="form-bln" type="number" class="form-control" min="1">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                                
                         </div>
                     </div>
                     <div class="modal-footer">

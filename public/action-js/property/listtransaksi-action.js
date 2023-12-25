@@ -83,7 +83,7 @@ function getListData() {
             paginate    : { 'first': 'First', 'last': 'Last', 'next': '&rarr;', 'previous': '&larr;' }
         },
         buttons: [
-            
+                
             { 
                 className: 'btnreload',
                 text: '<i class="bi bi-arrow-clockwise" ></li>',
@@ -110,17 +110,22 @@ function getListData() {
             },
             {sClass:"td100",
                 render: function (data, type, row, meta) {
-                if(row.fasilitas_penghuni){
-                    return row.fasilitas+','+row.fasilitas_penghuni;
-                }else{
-                    return row.fasilitas;
-                }
+                return row.fasilitas;
+                }, 
+            },
+            {sClass:"td100",
+                render: function (data, type, row, meta) {
+                return row.fasilitas_penghuni;
                 }, 
             },
             { data: "durasi",sClass:"td150",
                 mRender: function (data, type, row) {
                     return window.datetostring2('yymmdd',row.tgl_awal) +'<br><b> &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;SD </b><br>'+window.datetostring2('yymmdd',row.tgl_akhir);
                 }
+            },
+            { mRender: function (data, type, row) {
+                return datetostring2('yymmdd His nyatu',row.created_at)
+            }
             },
             { mRender: function (data, type, row) {
                 return `<a style="cursor:pointer;color:red;" class="showbill" >Klik Disini</a>`
@@ -162,11 +167,8 @@ function getListData() {
 
 function showbill(params) {
     var masasewa = datetostring2('yymmdd',params.tgl_awal)+` - `+datetostring2('yymmdd',params.tgl_akhir) ;
-    jmlbulan = getMonthDifference(
-    new Date(params.tgl_awal), new Date(params.tgl_akhir)) + ' Bulan' ;
-    jmlbulan2 = getMonthDifference(
-    new Date(params.tgl_awal), new Date(params.tgl_akhir)) ;
-    biaya = String(params.biaya * jmlbulan2);
+    jmlbulan = params.jml_bulan +' Bulan';
+    biaya = params.total_biaya;
     
     $(".btndownloadsert").removeAttr("onclick");
     $(".btndownloadsert").attr("onclick","generatePDF('"+params.name+"','"+masasewa+"')");
@@ -197,8 +199,8 @@ function showbill(params) {
                                         - mohon disimpan baik-baik
                                     </div>
                                     <br>
-                                    <b class="bold">Biaya Kamar Rp.`+formatRupiah(params.harga) +` X `+jmlbulan+`</b><br>
-                                    <b class="bold">Fasilitas Tambahan Rp. `+formatRupiah(params.biayatambah)+` X `+jmlbulan+`</b><br>
+                                    <b class="bold">Biaya Kamar Rp.`+formatRupiah(params.biaya_kamar) +` X `+jmlbulan+`</b><br>
+                                    <b class="bold">Fasilitas Tambahan Rp. `+formatRupiah(params.biaya_tambahan)+` X `+jmlbulan+`</b><br>
                                 </div>
                             </div>
                         </div>
@@ -217,7 +219,7 @@ function showbill(params) {
                                 </b>
                                 </div>
                                 <div class="col-sm-4">
-                                    Bandung, `+datetostring2('yymmdd',params.tgl_bayar)+`<br>
+                                    Bandung, `+datetostring2('yymmdd',params.created_at)+`<br>
                                     &ensp;&ensp;&ensp;<img src="`+baseURL+`/template/admin/images/ttd.jpg" style="width:100px" alt="">
 
                                 </div>

@@ -1,27 +1,39 @@
-@extends('layout.default')
-@push('after-style')
-    @foreach ($cssFiles as $file)
-        <link rel="stylesheet" href="{{ $file }}">
-    @endforeach
-@endpush
-@section('content')
-    <style>
-        .bill{
-            border: 2px solid black;
-            font-size: 10px;
-        }
-        th{
-            font-weight: 500 !important;
-        }
-        .bold{
-            font-weight: bold !important;
-        }
-    </style>
-    <section class="section dashboard">
+<section class="section dashboard">
         <div class="row">
-            <h2>List Transaksi</h2>
+            <h2>Dashboard Monitoring Kamar</h2>
             <br>
-            
+            @if (Str::lower($role) == 'pemilik' || Str::lower($role) == 'superadmin')
+                <div class="col-lg-12">
+                    <div class="card-filter">
+                        <label style="font-size:18px;">Filter</label>
+                        <hr>
+                        <div class="row">
+
+                            <div class="col-sm-3">
+                                <label>Sisa Hari Sewa</label>
+                                <select id="filter-sisa" name="filter-sisa" class="select2 ">
+                                    <option value="">Semua Waktu</option>
+                                    <option value="<= 7"> <= 7 Hari</option>
+                                    <option value="= 0"> 1 Hari</option>
+                                    <option value="<= -1"> Telat</option>
+                                    <option value="<= -7"> Telat >=7 Hari </option>
+                                </select>
+                            </div>
+                            {{-- <div class="col-sm-3">
+                                <label>Status Bayar</label>
+                                <select id="filter-status" name="filter-status" class="select2 ">
+                                    <option value="">Semua Status</option>
+                                    <option value="0">Belum Bayar</option>
+                                    <option value="1">Sudah Bayar</option>
+                                </select>
+                            </div> --}}
+                            <div class="col-sm-2">
+                                <button type="submit" id="filter-btn" class="btn btn-sgn" style="color:#e12a2a;width:100%;height:35px;font-size:14px;margin-top: 27px;"><i class="bi bi-search" style="font-size:12px;" ></i> Cari</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div><br>
         <div class="row">
             <div class="col-lg-12">
@@ -32,14 +44,17 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Penghuni</th>
-                                        <th>Handphone</th>
                                         <th>No Kamar</th>
+                                        <th>lantai</th>
                                         <th>Fasilitas</th>
-                                        <th>Fasilitas Tambahan</th>
+                                        <th>Status</th>
                                         <th>Masa Kos</th>
-                                        <th>Tanggal Transaksi</th>
-                                        <th>Nota</th>
+                                        <th>Durasi</th>
+                                        <th>Penghuni</th>
+                                        <th>Tagihan (Bulan)</th>
+                                        <th>Tagihan (Rp)</th>
+                                        <th>Status Bayar</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -55,7 +70,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Nota</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">Pembayaran</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -87,6 +102,12 @@
                                 </form>
                             </div>
                         </div>
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Jml Bulan (*)</label>
+                            <div class="col-sm-9">
+                                <input id="form-bln" name="form-bln" type="number" class="form-control" min="1">
+                            </div>
+                        </div>
                     </center>
                 </div>
                 <div class="modal-footer">
@@ -97,19 +118,3 @@
             </div>
         </div>
     <section
-@endsection
-
-@push('after-script')
-    <script> 
-        @foreach ($varJs as $varjsi)
-            {!! $varjsi !!}
-        @endforeach
-    </script>
-        
-        
-    @foreach ($javascriptFiles as $file)
-        <script src="{{ $file }}"></script>
-    @endforeach
-@endpush
-
-

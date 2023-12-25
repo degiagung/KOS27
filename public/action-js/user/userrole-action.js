@@ -52,8 +52,8 @@ function getListView() {
         },
         buttons: [
             
-            { text: ' <i class="bi bi-file-earmark-spreadsheet-fill"></i> PDF ', extend: 'pdfHtml5',  className: 'btndownload',  title:'List User', exportOptions: {columns:[':not(.notdown)']}},
-            { text: ' <i class="bi bi-file-earmark-spreadsheet-fill"></i> EXCEL ', extend: 'excel',  className: 'btndownload',  title:'List User', exportOptions: {columns:[':not(.notdown)']}},
+            { text: '', extend: 'pdfHtml5',  className: 'btndownload iconpdf',  title:'List Akses', exportOptions: {columns:[':not(.notdown)']}},
+            { text: '', extend: 'excel',  className: 'btndownload iconexcel',  title:'List Akses', exportOptions: {columns:[':not(.notdown)']}},
             { 
                 className: 'btnreload',
                 text: '<i class="bi bi-arrow-clockwise" ></li>',
