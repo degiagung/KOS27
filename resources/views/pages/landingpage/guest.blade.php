@@ -42,39 +42,56 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingOne">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        Mengapa Bisa Menjadi Ternyaman ?
+                        Visi Misi Perusahaan
                     </button>
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
-                        <strong>Kos 27</strong> adalah kos yang mengutamakan kenyamanan , sehingga calon penghuni akan di berikan pengarahan dan peraturan agar bisa menjaga kerbersihan serta kenyamanan penghuni lain   
+                        <strong>Visi Misi Perusahaan</strong> Perusahaan Kos Putri 27 Memiliki Visi dan Misi yang dapat meningkatkan
+                        motivasi karyawan dalam bekerja serta mewujudkan tujuan dari perusahaan.  
                     </div>
                     </div>
                 </div>
-                {{-- <div class="accordion-item">
+                <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwo">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        How does this work ?
+                        Visi
                     </button>
                     </h2>
                     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
-                        Dolor <strong>almesit amet</strong>, consectetur adipiscing elit, sed doesn't eiusmod tempor incididunt ut labore consectetur <code>adipiscing</code> elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        <strong>Visi </strong>Menjadikan pilihan utama dan terdepan dalam menyediakan tempat tinggal yang aman dan nyaman
+                        bagi mahasiswi yang sedang menempuh pendidikan di Bandung
                     </div>
                     </div>
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingThree">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                        Mengapa Bisa Menjadi Ternyaman ?
+                        Misi
                     </button>
                     </h2>
                     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
-                        <strong>Kos 27</strong> adalah kos yang mengutamakan kenyamanan , sehingga calon penghuni akan di berikan pengarahan dan peraturan agar bisa menjaga kerbersihan serta kenyamanan penghuni lain   
+                        <strong>Misi </strong> 
+                        <ul>
+                            <li>
+                                1. Menyediakan lingkungan yang aman dan terawat agar para mahasiswi dapat fokus
+                                pada pendidikan mereka tanpa khawatir akan keamanan tempat tinggal.
+                            </li>
+                            <li>
+                                2. Menyediakan fasilitas dan layanan yang memenuhi standar kualitas tinggi. 
+                            </li>
+                            <li>
+                                3. Menciptakan suasana yang welcoming dan mendukung bagi semua penghuni.
+                            </li>
+                            <li>
+                                4. Menciptakan suasana harmonis diantara penghuni
+                            </li>
+                        </ul>
                     </div>
                     </div>
-                </div> --}}
+                </div>
                 </div>
             </div>
             <div class="col-lg-3">

@@ -15,51 +15,6 @@ use Illuminate\Support\Facades\Session;
 
 class JsonDataController extends Controller
 {   
-    public function signup(){
-        $attributes = request()->validate([
-            'name' => ['required', 'max:50'],
-            'email' => 'required|max:50|unique:users',
-            'handphone' => ['required', 'min:5', 'max:20'],
-            'password' => ['required', 'min:5', 'max:20'],
-        ]);
-        DB::beginTransaction();  
-        $MasterClass    = new Master();
-        $request        = request();
-        $attributes     = [
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'handphone' => $request->handphone,
-            'password'  => $request->password,
-            'is_active' => '1',
-            'role_id'   => 10
-        ];
-        $attributes['password'] = bcrypt($attributes['password'] );
-        $user = $MasterClass->saveGlobal('users', $attributes );
-        $credentials = [
-            "email"     =>  $request->email,
-            "password"  =>  $request->password,
-        ];
-
-        Auth::attempt($credentials); 
-        if(Auth::check() == true){
-            DB::commit();
-            Session::put('user_id', Auth::user()->id);
-            Session::put('name', Auth::user()->name);
-            Session::put('role_id', Auth::user()->role_id);
-            $code = $MasterClass::CODE_SUCCESS ;
-            $info = $MasterClass::INFO_SUCCESS ;
-        }else{
-            DB::rollback();
-            $code = $MasterClass::CODE_FAILED ;
-            $info = $MasterClass::INFO_FAILED ;
-        }
-        $results = [
-            'code'  => $code,
-            'info'  => $info,
-        ];
-
-        return $MasterClass->Results($results);
-    }
     // for list menu side bar
     public function getAccessMenu(Request $request){
 
@@ -1324,6 +1279,86 @@ class JsonDataController extends Controller
         return $MasterClass->Results($results);
 
     }
+    public function cekdatakamar(Request $request){
+
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+        
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            try {
+                if ($request->isMethod('post')) {
+
+                    DB::beginTransaction();
+                    
+                    $id     = $request->id ;
+                    $status = [];
+                    
+                    $select = "
+                        k.id as idkamar,k.no_kamar,k.lantai,k.harga,
+                        GROUP_CONCAT(f.fasilitas SEPARATOR ',') as faskos,
+                        tk.tipe
+                    ";
+                    $from   = " 
+                        kamar k 
+                        join mapping_kamar mk on mk.id_kamar = k.id
+                        join mapping_fasilitas mf on mf.id_kamar = k.id
+                        join fasilitas f on f.id = mf.id_fasilitas and f.penyedia = 'pihak kos'
+                        join tipe_kamar tk on tk.id = mk.id_tipe
+                    ";
+                    $where = " k.id = $id and mk.user_id is null";
+                    $where .="
+                        GROUP BY 
+                        k.id,k.no_kamar,k.lantai,k.harga,
+                        tk.tipe
+                    ";
+                    // print_r("SELECT $select FROM $from WHERE $where");die;
+                    $saved = DB::select("SELECT $select FROM $from WHERE $where");
+                    $saved = $MasterClass->checkErrorModel($saved);
+                    
+                    $status = $saved;
+ 
+                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                    //     DB::commit();
+                    // }else{
+                    //     DB::rollBack();
+                    // }
+        
+                    $results = [
+                        'code' => $status['code'],
+                        'info'  => $status['info'],
+                        'data'  =>  $status['data'],
+                    ];
+                        
+        
+        
+                } else {
+                    $results = [
+                        'code' => '103',
+                        'info'  => "Method Failed",
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Roll back the transaction in case of an exception
+                $results = [
+                    'code' => '102',
+                    'info'  => $e->getMessage(),
+                ];
+    
+            }
+        }
+        else {
+    
+            $results = [
+                'code' => '403',
+                'info'  => "Unauthorized",
+            ];
+            
+        }
+
+        return $MasterClass->Results($results);
+
+    }
     //CRUD FUNCTION
         public function saveUser(Request $request){
 
@@ -2309,5 +2344,77 @@ class JsonDataController extends Controller
             return $MasterClass->Results($results);
 
         }
+        public function savebooking(Request $request){
+            $MasterClass = new Master();
+            Session::get('user_id');
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
 
+                        DB::beginTransaction();
+                        $id                 = $request->idkamar;                        
+                        $penghuni           = $MasterClass->getSession('user_id');
+                        $durasi             = $request->tanggal;
+                        $jmlbulan           = $request->bulan;
+                        $tipekamar          = $request->tipe;
+                        $tglawal            = null;
+                        $tglakhir           = null;
+                        if($penghuni){
+                            $tglawal       = date("Y-m-d",strtotime($durasi)) ;
+                            $tglakhir      = date("Y-m-d", strtotime("+".$jmlbulan." month", strtotime($tglawal))) ;
+                        }
+                        $now                = date('Y-m-d H:i:s');
+                        $attrmapping     = [
+                            'user_id'       => $penghuni,
+                            'id_kamar'      => $id,
+                            'id_tipe'       => $tipekamar,
+                            'tgl_awal'      => $tglawal,
+                            'tgl_akhir'     => $tglakhir,
+                            'created_at'    => $now,
+                        ];
+                        $savedmapping      = $MasterClass->saveGlobal('mapping_kamar', $attrmapping );
+                        if($savedmapping['code'] != $MasterClass::CODE_SUCCESS){
+                            DB::rollBack();
+                            $results = [
+                                'code' => '1',
+                                'info'  => "Gagal simpan data booking",
+                            ];
+                            return $MasterClass->Results($results);
+                        }
+
+                        DB::commit();
+                        $results = [
+                            'code'  => $MasterClass::CODE_SUCCESS,
+                            'info'  => 'ok',
+                        ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
 }

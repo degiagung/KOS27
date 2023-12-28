@@ -359,6 +359,74 @@ class GeneralController extends Controller
         }
         
     }
+    public function booking(Request $request){
+
+        $MasterClass = new Master();
+
+        if(Auth::check()){
+            $javascriptFiles = [
+                asset('action-js/property/booking-action.js'),
+            ];
+        
+            $cssFiles = [
+                // asset('css/main.css'),
+                // asset('css/custom.css'),
+            ];
+            $baseURL = url('/');
+            $rolename = strtolower($MasterClass->getSession('role_name'))  ;
+            $varJs = [
+                'const baseURL = "' . $baseURL . '"',
+                'const role = "' . $rolename .'"',
+
+            ];
+            $data = [
+                'javascriptFiles' => $javascriptFiles,
+                'cssFiles' => $cssFiles,
+                'varJs'=> $varJs,
+                 // Menambahkan base URL ke dalam array
+            ];
+        
+            return view('pages.landingpage.booking')
+                ->with($data);
+        }else{
+            return redirect('/login');
+        }
+        
+    }
+    public function details($id){
+        $MasterClass = new Master();
+
+        if(Auth::check()){
+            $javascriptFiles = [
+                asset('action-js/property/details.js'),
+            ];
+        
+            $cssFiles = [
+                // asset('css/main.css'),
+                // asset('css/custom.css'),
+            ];
+            $baseURL = url('/');
+            $rolename = strtolower($MasterClass->getSession('role_name'))  ;
+            $varJs = [
+                'const baseURL = "' . $baseURL . '"',
+                'const role = "' . $rolename .'"',
+                'const idkamar = "' . $id .'"',
+
+            ];
+            $data = [
+                'javascriptFiles' => $javascriptFiles,
+                'cssFiles' => $cssFiles,
+                'varJs'=> $varJs,
+                 // Menambahkan base URL ke dalam array
+            ];
+        
+            return view('pages.landingpage.property-details')
+                ->with($data);
+        }else{
+            return redirect('/login');
+        }
+        
+    }
 }
 
 

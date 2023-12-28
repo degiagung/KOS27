@@ -51,12 +51,12 @@
 </head>
 
 <body class="g-sidenav-show  bg-gray-100 rtl ">
-  @auth
+  {{-- @auth
     @yield('auth')
-  @endauth
-  @guest
+  @endauth --}}
+  {{-- @guest --}}
     @yield('guest')
-  @endguest
+  {{-- @endguest --}}
 
   @if(session()->has('success'))
     <div x-data="{ show: true}"

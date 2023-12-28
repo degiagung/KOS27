@@ -48,8 +48,27 @@
                       <li><a href="{{ route('guest') }}" class="active">Home</a></li>
                       <li><a href="{{ route('kostan') }}" >Kamar Kos</a></li>
                       <li><a href="{{ route('contact') }}">Kontak</a></li>
-                      <li><a href="{{ route('login') }}">Login</a></li>
-                      <li><a href="{{ route('booking') }}"><i class="fa fa-calendar"></i> Booking</a></li>
+                      @guest
+                        <li><a href="{{ route('login') }}">Login</a></li>
+                      @endguest
+                      @auth
+                        <li>
+                          
+                          {{-- <li> --}}
+                              {{-- <button type="submit" class="dropdown-item d-flex align-items-center"> --}}
+                                  {{-- <i class="bi bi-box-arrow-right"></i> --}}
+                                  <a >
+                                    <form action="{{ route('logout') }}" method="POST">
+                                      @csrf
+                                      <button style=" background: transparent;border: none;">Logout</button>
+                                    </form>  
+
+                                  </a>
+                              {{-- </button> --}}
+                          {{-- </li> --}}
+                        </li>  
+                      @endauth
+                      {{-- <li><a href="{{ route('booking') }}"><i class="fa fa-calendar"></i> Booking</a></li> --}}
                   </ul>   
                     <a class='menu-trigger'>
                         <span>Menu</span>

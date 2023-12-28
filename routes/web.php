@@ -25,7 +25,7 @@ Route::get('/login', [AuthController::class, 'index'])->name('login')->middlewar
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/sign-up', [AuthController::class, 'signup'])->name('sign-up')->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::post('/signup', [JsonDataController::class, 'signup'])->name('signup');
+Route::post('/signup', [AuthController::class, 'create'])->name('signup');
 
 Route::get('/generateview', [GenerateController::class, 'generateview']);
 Route::get('/gendataview', [GenerateController::class, 'gendataview']);
@@ -39,11 +39,11 @@ Route::get('/kostan', function () {
 Route::get('/contact', function () {
     return view('pages.landingpage.layouts');
 })->name('contact');
-Route::get('/booking', function () {
-    return view('pages.landingpage.booking');
-})->name('booking');
-
 Route::middleware(['auth'])->group(function () {
+    Route::get('/details/{id}', [GeneralController::class, 'details'])->name('details/{id}');
+    Route::get('/booking', [GeneralController::class, 'booking'])->name('booking');
+    Route::post('/saveBooking', [JsonDataController::class, 'saveBooking'])->name('saveBooking');
+    Route::post('/cekdatakamar', [JsonDataController::class, 'cekdatakamar'])->name('cekdatakamar');
     // Route::get('/', [GeneralController::class, 'based']);
 
     Route::middleware(['role:Superadmin'])->group(function () {

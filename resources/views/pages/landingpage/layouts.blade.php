@@ -26,6 +26,9 @@
     <link rel="stylesheet" href="../ref_layouts/landingpage/assets/css/animate.css">
     <link rel="stylesheet"href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
     <link rel='stylesheet' href='https://unpkg.com/leaflet@1.8.0/dist/leaflet.css' crossorigin='' />
+    <link href="{{ asset('template/admin/vendor/sweetalert2/dist/sweetalert2.min.css') }}" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
     @stack('before-js')
 
@@ -67,6 +70,8 @@ https://templatemo.com/tm-591-villa-agency
     <script src="../ref_layouts/landingpage/assets/js/counter.js"></script>
     <script src="../ref_layouts/landingpage/assets/js/custom.js"></script>
     <script src='https://unpkg.com/leaflet@1.8.0/dist/leaflet.js' crossorigin=''></script>
+    <script src="{{ asset('template/admin/vendor/sweetalert2/dist/sweetalert2.min.js') }}" aria-hidden="true"></script>
+
     <script>
         showmpas()
         function showmpas(){
