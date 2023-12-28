@@ -109,9 +109,10 @@ function getListData() {
                 mRender: function (data, type, row) {
                     if(row.status_kamar == 'Kosong'){
                         return `<a style="color:green;font-weight:bold;">`+row.status_kamar+`</a>`;
+                    }else if(row.status_kamar == 'Booking'){
+                        return `<a style="color:#c5c527;font-weight:bold;">`+row.status_kamar+`</a>`; 
                     }else{
                         return `<a style="color:red;font-weight:bold;">`+row.status_kamar+`</a>`;
-
                     }
                 }
             },
@@ -187,53 +188,107 @@ function getListData() {
 let isObject = {};
 
 function editdata(rowData) {
-    
-    fotokamar(rowData.id)
-    loadfasilitas('kos','fasilitas-perbaikan',rowData.id);
-    $(".perbaikan").show();
     isObject = {};
     isObject = rowData;
     isObject['tipe'] = 'update';
-    $('#formkamar select').val('').trigger('change');
-    $('#formkamar input').val('');
-    $("#form-no").val(rowData.no_kamar);
-    $("#form-lantai").val(rowData.lantai);
-    $("#form-tipe").val(rowData.tipe).trigger('change');;
-    $("#form-harga").val(rowData.harga);
-    $("#form-penghuni").val(rowData.user_id).trigger('change');
-    $("#form-durasi").val(rowData.tgl_awal);
-    $("#form-bln").val(getMonthDifference(new Date(rowData.tgl_awal), new Date(rowData.tgl_akhir)));
-   
-    const idfaskos=rowData.idfaskos;
-    const idfaskosp=rowData.idfaskosp;
-    const idperbaikan=rowData.idperbaikan;
-    const faskos = [];
-    const faskosp = [];
-    const fasper = [];
-    if(idfaskos){
-        $.each(idfaskos.split(","), function(i,e){
-            faskos.push(e);    
-        });
-        $("#form-fasilitas").val(faskos).trigger('change');
-    }
-    if(idfaskosp){
-        $.each(idfaskosp.split(","), function(i,e){
-            faskosp.push(e);
-        });
-        $("#form-fasilitas-penghuni").val(faskosp).trigger('change')
-    }
-    // console.log(idperbaikan)
-    setTimeout(() => {
-        if(idperbaikan){
-            $.each(idperbaikan.split(","), function(i,e){
-                fasper.push(e);
+    if(rowData.status_kamar == 'Booking'){
+        editbooking(rowData);
+    }else{
+
+        fotokamar(rowData.id)
+        loadfasilitas('kos','fasilitas-perbaikan',rowData.id);
+        $(".perbaikan").show();
+        $('#formkamar select').val('').trigger('change');
+        $('#formkamar input').val('');
+        $("#form-no").val(rowData.no_kamar);
+        $("#form-lantai").val(rowData.lantai);
+        $("#form-tipe").val(rowData.tipe).trigger('change');;
+        $("#form-harga").val(rowData.harga);
+        $("#form-penghuni").val(rowData.user_id).trigger('change');
+        $("#form-durasi").val(rowData.tgl_awal);
+        $("#form-bln").val(getMonthDifference(new Date(rowData.tgl_awal), new Date(rowData.tgl_akhir)));
+       
+        const idfaskos=rowData.idfaskos;
+        const idfaskosp=rowData.idfaskosp;
+        const idperbaikan=rowData.idperbaikan;
+        const faskos = [];
+        const faskosp = [];
+        const fasper = [];
+        if(idfaskos){
+            $.each(idfaskos.split(","), function(i,e){
+                faskos.push(e);    
             });
-            $("#form-fasilitas-perbaikan").val(fasper).trigger('change')
+            $("#form-fasilitas").val(faskos).trigger('change');
         }
-    }, 2000);
-    $("#modal-data").modal("show");
+        if(idfaskosp){
+            $.each(idfaskosp.split(","), function(i,e){
+                faskosp.push(e);
+            });
+            $("#form-fasilitas-penghuni").val(faskosp).trigger('change')
+        }
+        // console.log(idperbaikan)
+        setTimeout(() => {
+            if(idperbaikan){
+                $.each(idperbaikan.split(","), function(i,e){
+                    fasper.push(e);
+                });
+                $("#form-fasilitas-perbaikan").val(fasper).trigger('change')
+            }
+        }, 2000);
+        $("#modal-data").modal("show");
+    }
 
 
+}
+
+function editbooking(data) {
+  
+    swal({
+        title: "Apakah Yakin Untuk Menyetujui ?",
+        type: "warning",
+        showCancelButton: !0,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Setujui",
+        cancelButtonText: "Kembali",
+        closeOnConfirm: !1,
+        closeOnCancel: !1,
+    }).then(function (e) {
+        if (e.value) {
+            $.ajax({
+                url: baseURL + "/setujuibooking",
+                type: "POST",
+                data: JSON.stringify({ id: data.user_id }),
+                dataType: "json",
+                contentType: "application/json",
+                beforeSend: function () {
+                    Swal.fire({
+                        title: "Loading",
+                        text: "Mohon Tunggu...",
+                    });
+                },
+                complete: function () {
+                    $('#table-list').DataTable().ajax.reload();
+                },
+                success: function (response) {
+                    // Handle response sukses
+                    if (response.code == 0) {
+                        swal("Berhasil !", response.message, "success");
+                    } else {
+                        sweetAlert("Oops...", response.message, "ERROR");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    sweetAlert("Oops...", "ERROR", "ERROR");
+                },
+            });
+        } else {
+            swal(
+                "Batal",
+                "Data tidak berubah",
+                "ERROR"
+            );
+        }
+    });
 }
 
 function fotokamar(id){

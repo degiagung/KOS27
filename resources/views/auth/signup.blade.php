@@ -2,8 +2,7 @@
 @extends('layouts.user_type.guest')
 
 @section('content')
-    
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <main class="main-content  mt-0">
         <section class="min-vh-100 mb-8">
         <div class="page-header align-items-start min-vh-50 pt-5 pb-11 mx-3 border-radius-lg" style="background-image: url('../assets/img/registerbg.jpg');">

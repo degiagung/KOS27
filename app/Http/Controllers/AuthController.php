@@ -85,7 +85,7 @@ class AuthController extends Controller
 
         return redirect('/login');
     }
-    protected function create(){
+    public function createaccount(){
         $attributes = request()->validate([
             'name' => ['required', 'max:50'],
             'handphone' => ['required', 'min:5', 'max:20'],

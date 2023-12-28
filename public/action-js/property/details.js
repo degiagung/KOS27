@@ -23,12 +23,16 @@ function savebooking() {
     }
     isObject['tanggal'] = $("#form-tgl").val(); 
     isObject['bulan'] = $("#form-bln").val(); 
+    isObject['idkamar'] = idkamar; 
     $.ajax({
         url: baseURL + "/saveBooking",
         type: "POST",
         data: JSON.stringify(isObject),
         dataType: "json", 
         contentType: "application/json",
+        headers: {
+        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
         beforeSend: function () {
             swal({
                 title: "Loading",
@@ -63,7 +67,6 @@ function cekdatakamar(){
 
         },
         success: function(result){
-            console.log(result);
             if (result['data']){
                 data = result['data'] ;
                 $("#nokamar").html(data[0]['no_kamar']);
@@ -71,6 +74,7 @@ function cekdatakamar(){
                 $("#tipe").html(data[0]['tipe']);
                 $("#harga").html(data[0]['harga']+' / Bulan');
                 $("#fasilitas").html(data[0]['faskos']);
+                isObject['tipe'] = data[0]['idtipe'];
             
             }
             else{

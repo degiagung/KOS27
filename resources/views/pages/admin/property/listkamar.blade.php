@@ -20,7 +20,8 @@
                             <select id="filter-status" name="filter-status" class="select2 ">
                                 <option value="">Semua Status</option>
                                 <option value="1">Terisi</option>
-                                <option value="2">Belum Terisi</option>
+                                <option value="2">Kosong</option>
+                                <option value="3">Booking</option>
                             </select>
                         </div>
                         <div class="col-sm-3">

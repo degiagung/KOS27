@@ -16,10 +16,10 @@ function saveData() {
     url = baseURL + "/signup";
 
     $.ajax({
-        url: url,
-        type: "POST",
+        type: 'POST',
+        dataType: 'json',
+        url: baseURL + '/createaccount',
         data: JSON.stringify(isObject),
-        dataType: "json", 
         contentType: "application/json",
         beforeSend: function () {
             swal("Loading","Mohon Ditunggu ....");

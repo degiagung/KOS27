@@ -427,6 +427,34 @@ class GeneralController extends Controller
         }
         
     }
+    public function kostan(Request $request){
+
+        
+        $javascriptFiles = [
+            asset('action-js/property/kostan.js'),
+        ];
+    
+        $cssFiles = [
+            // asset('css/main.css'),
+            // asset('css/custom.css'),
+        ];
+        $baseURL = url('/');
+        $varJs = [
+            'const baseURL = "' . $baseURL . '"',
+
+        ];
+        $data = [
+            'javascriptFiles' => $javascriptFiles,
+            'cssFiles' => $cssFiles,
+            'varJs'=> $varJs,
+                // Menambahkan base URL ke dalam array
+        ];
+    
+        return view('pages.landingpage.kostan')
+            ->with($data);
+        
+    }
+    
 }
 
 

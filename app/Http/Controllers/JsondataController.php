@@ -16,1248 +16,1429 @@ use Illuminate\Support\Facades\Session;
 class JsonDataController extends Controller
 {   
     // for list menu side bar
-    public function getAccessMenu(Request $request){
+        public function getAccessMenu(Request $request){
 
-        $MasterClass = new Master();
+            $MasterClass = new Master();
 
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
 
-                    DB::beginTransaction();     
-                    
-                    $data = json_decode($request->getContent());
-                    $status = [];
-                    $role_id = $MasterClass->getSession('role_id');
-                    $saved = DB::select("SELECT * FROM menus_access ma LEFT JOIN users_access ua ON ma.id = ua.menu_access_id WHERE ua.role_id =".$role_id. " AND ua.i_view=1 order by ma.menu_name asc");
-
-                    $saved = $MasterClass->checkErrorModel($saved);
-                    
-                    $status = $saved;
- 
-                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
-                    //     DB::commit();
-                    // }else{
-                    //     DB::rollBack();
-                    // }
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
+                        DB::beginTransaction();     
                         
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
+                        $data = json_decode($request->getContent());
+                        $status = [];
+                        $role_id = $MasterClass->getSession('role_id');
+                        $saved = DB::select("SELECT * FROM menus_access ma LEFT JOIN users_access ua ON ma.id = ua.menu_access_id WHERE ua.role_id =".$role_id. " AND ua.i_view=1 order by ma.menu_name asc");
 
-        return $MasterClass->Results($results);
-
-    }
-    //USER ROLE
-    public function getRoleMenuAccess(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    $data = json_decode($request->getContent());
-                    
-                    DB::beginTransaction();
-            
-                    $status = [];
-                    $sql    ="SELECT * FROM users_roles ur LEFT JOIN users_access ua ON ur.id = ua.role_id WHERE ua.menu_access_id=".$data->id;
-                    // dd($sql);
-                    $saved = DB::select($sql);
-                    $saved = $MasterClass->checkErrorModel($saved);
-                    
-                    $status = $saved;
- 
-                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
-                    //     DB::commit();
-                    // }else{
-                    //     DB::rollBack();
-                    // }
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
-                        
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function getRole(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    $data = json_decode($request->getContent());
-
-                    
-                    DB::beginTransaction();
-            
-                    $status = [];
-  
-                    $saved = DB::select('SELECT * FROM users_roles ur');
-                    $saved = $MasterClass->checkErrorModel($saved);
-                    
-                    $status = $saved;
- 
-                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
-                    //     DB::commit();
-                    // }else{
-                    //     DB::rollBack();
-                    // }
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
-                        
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function getAccessRole(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    DB::beginTransaction();
-
-                    $dataArray = $request->get('param_type');
-
-                    $status = [];
-                    $sql ='SELECT ma.*  FROM menus_access ma WHERE ma.param_type ="'.$dataArray.'"';
-                    
-                    $saved = DB::select($sql);
-                    // $saved = MenusAccess::leftJoin()where('param_type', 'VIEW')->get();
-                    
-                    $saved = $MasterClass->checkErrorModel($saved);
-                    
-                    $status = $saved;
- 
-                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
-                    //     DB::commit();
-                    // }else{
-                    //     DB::rollBack();
-                    // }
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
-                        
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function saveUserAccessRole(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    $dataArray = json_decode($request->getContent());
-
-                    DB::beginTransaction();
-                    $status = [];
-                    // Simpan informasi metode ke dalam database AccessUser
-                    foreach ($dataArray as $data) {
-
-                        $saved = UserAccess::updateOrCreate(
-                            [
-                                'menu_access_id' => $data->mid,
-                                'role_id' => $data->rid, // Gantilah $roleId dengan nilai yang sesuai
-                            ], // Kolom dan nilai kriteria
-                            [
-                                'i_view' => $data->is_active,
-                            ] // Kolom yang akan diisi
-                        );
                         $saved = $MasterClass->checkErrorModel($saved);
                         
                         $status = $saved;
-                        
-                        if($status['code'] != $MasterClass::CODE_SUCCESS){
-                            break;
-                        }
-                       
-                    }   
-
-                    if($status['code'] == $MasterClass::CODE_SUCCESS){
-                        DB::commit();
-                    }else{
-                        DB::rollBack();
-                        
-                    }               
-                    
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
     
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
+                        // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                        //     DB::commit();
+                        // }else{
+                        //     DB::rollBack();
+                        // }
             
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function updateMenuAccessName(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
         
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    $mid = $request->get('mid');
-                    $headmenu = $request->get('nhead');
-                    $menuname = $request->get('nmenu');
-
-                    DB::beginTransaction();
-                    // dd($mid);
-                    
-                    $status = [];
-                    // Simpan informasi metode ke dalam database AccessUser
-                    
-                    $saved = MenusAccess::where([
-                        'id' => $mid,
-                    ])->update([
-                        'header_menu' => $headmenu,
-                        'menu_name' => $menuname,
-                    ]);
-
-
-                    $saved = $MasterClass->checkerrorModelUpdate($saved);
-                    
-                    $status = $saved;
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
                 
-
-                    if($status['code'] == $MasterClass::CODE_SUCCESS){
-                        DB::commit();
-                    }else{
-                        DB::rollBack();
-                        
-                    }               
-                    
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
-
-                    // dd($results);
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
             }
+
+            return $MasterClass->Results($results);
+
         }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
+    //USER ROLE
+        public function getRoleMenuAccess(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
             
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        $data = json_decode($request->getContent());
+                        
+                        DB::beginTransaction();
+                
+                        $status = [];
+                        $sql    ="SELECT * FROM users_roles ur LEFT JOIN users_access ua ON ur.id = ua.role_id WHERE ua.menu_access_id=".$data->id;
+                        // dd($sql);
+                        $saved = DB::select($sql);
+                        $saved = $MasterClass->checkErrorModel($saved);
+                        
+                        $status = $saved;
+    
+                        // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                        //     DB::commit();
+                        // }else{
+                        //     DB::rollBack();
+                        // }
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
         }
+        public function getRole(Request $request){
 
-        return $MasterClass->Results($results);
+            $MasterClass = new Master();
 
-    }
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        $data = json_decode($request->getContent());
+
+                        
+                        DB::beginTransaction();
+                
+                        $status = [];
+    
+                        $saved = DB::select('SELECT * FROM users_roles ur');
+                        $saved = $MasterClass->checkErrorModel($saved);
+                        
+                        $status = $saved;
+    
+                        // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                        //     DB::commit();
+                        // }else{
+                        //     DB::rollBack();
+                        // }
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function getAccessRole(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();
+
+                        $dataArray = $request->get('param_type');
+
+                        $status = [];
+                        $sql ='SELECT ma.*  FROM menus_access ma WHERE ma.param_type ="'.$dataArray.'"';
+                        
+                        $saved = DB::select($sql);
+                        // $saved = MenusAccess::leftJoin()where('param_type', 'VIEW')->get();
+                        
+                        $saved = $MasterClass->checkErrorModel($saved);
+                        
+                        $status = $saved;
+    
+                        // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                        //     DB::commit();
+                        // }else{
+                        //     DB::rollBack();
+                        // }
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function saveUserAccessRole(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        $dataArray = json_decode($request->getContent());
+
+                        DB::beginTransaction();
+                        $status = [];
+                        // Simpan informasi metode ke dalam database AccessUser
+                        foreach ($dataArray as $data) {
+
+                            $saved = UserAccess::updateOrCreate(
+                                [
+                                    'menu_access_id' => $data->mid,
+                                    'role_id' => $data->rid, // Gantilah $roleId dengan nilai yang sesuai
+                                ], // Kolom dan nilai kriteria
+                                [
+                                    'i_view' => $data->is_active,
+                                ] // Kolom yang akan diisi
+                            );
+                            $saved = $MasterClass->checkErrorModel($saved);
+                            
+                            $status = $saved;
+                            
+                            if($status['code'] != $MasterClass::CODE_SUCCESS){
+                                break;
+                            }
+                        
+                        }   
+
+                        if($status['code'] == $MasterClass::CODE_SUCCESS){
+                            DB::commit();
+                        }else{
+                            DB::rollBack();
+                            
+                        }               
+                        
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function updateMenuAccessName(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        $mid = $request->get('mid');
+                        $headmenu = $request->get('nhead');
+                        $menuname = $request->get('nmenu');
+
+                        DB::beginTransaction();
+                        // dd($mid);
+                        
+                        $status = [];
+                        // Simpan informasi metode ke dalam database AccessUser
+                        
+                        $saved = MenusAccess::where([
+                            'id' => $mid,
+                        ])->update([
+                            'header_menu' => $headmenu,
+                            'menu_name' => $menuname,
+                        ]);
+
+
+                        $saved = $MasterClass->checkerrorModelUpdate($saved);
+                        
+                        $status = $saved;
+                    
+
+                        if($status['code'] == $MasterClass::CODE_SUCCESS){
+                            DB::commit();
+                        }else{
+                            DB::rollBack();
+                            
+                        }               
+                        
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+
+                        // dd($results);
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
     
     //USER LIST
-    public function getUserList(Request $request){
+        public function getUserList(Request $request){
 
-        $MasterClass = new Master();
+            $MasterClass = new Master();
 
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    DB::beginTransaction();     
-                    
-                    $status = [];
-                    
-                    $select = "
-                        us.id,
-                        us.name,
-                        us.email,
-                        us.handphone,
-                            case 
-                                when us.is_active = '1' then 'ACTIVE' 
-                                when us.is_active = '2' then 'INACTIVE' 
-                            end status_name,
-                        us.is_active,
-                        us.role_id,
-                        ur.role_name 
-                    ";
-                    
-                    $table = '
-                        users us
-                        LEFT JOIN users_roles ur ON us.role_id = ur.id
-                    ';
-                    $result = $MasterClass->selectGlobal($select,$table);
-                    
-                    $results = [
-                        'code'  => $result['code'],
-                        'info'  => $result['info'],
-                        'data'  => $result['data'],
-                    ];
-                        
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
             
-        }
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
 
-        return $MasterClass->Results($results);
-
-    }
-    public function getPenghuniList(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    DB::beginTransaction();     
-                    
-                    $status = [];
-                    
-                    $select = "
-                        us.id,
-                        us.name,
-                        us.email,
-                        us.handphone,
-                            case 
-                                when us.is_active = '1' then 'ACTIVE' 
-                                when us.is_active = '2' then 'INACTIVE' 
-                            end status_name,
-                        us.is_active,
-                        us.role_id,
-                        ur.role_name 
-                    ";
-                    
-                    $table = '
-                        users us
-                        LEFT JOIN users_roles ur ON us.role_id = ur.id
-                    ';
-                    $where = " ur.role_name like  'penghuni' ";
-                    $result = $MasterClass->selectGlobal($select,$table,$where);
-                    
-                    $results = [
-                        'code'  => $result['code'],
-                        'info'  => $result['info'],
-                        'data'  => $result['data'],
-                    ];
+                        DB::beginTransaction();     
                         
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
+                        $status = [];
+                        
+                        $select = "
+                            us.id,
+                            us.name,
+                            us.email,
+                            us.handphone,
+                                case 
+                                    when us.is_active = '1' then 'ACTIVE' 
+                                    when us.is_active = '2' then 'INACTIVE' 
+                                end status_name,
+                            us.is_active,
+                            us.role_id,
+                            ur.role_name 
+                        ";
+                        
+                        $table = '
+                            users us
+                            LEFT JOIN users_roles ur ON us.role_id = ur.id
+                        ';
+                        $result = $MasterClass->selectGlobal($select,$table);
+                        
+                        $results = [
+                            'code'  => $result['code'],
+                            'info'  => $result['info'],
+                            'data'  => $result['data'],
+                        ];
+                            
             
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function getListKamar(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    DB::beginTransaction();     
-                    
-                    $status = [];
-                    
-                    $select = "
-                        k.id,
-                        k.lantai,
-                        k.no_kamar,
-                        k.status,
-                        k.harga,
-                        tk.tipe,
-                        GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
-                        GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp,
-                        GROUP_CONCAT(fsper.fasilitas SEPARATOR ',') as perbaikan,
-                        GROUP_CONCAT(fs.id SEPARATOR ',') as idfaskos,
-                        GROUP_CONCAT(fsp.id SEPARATOR ',') as idfaskosp,
-                        GROUP_CONCAT(fsper.id SEPARATOR ',') as idperbaikan,
-                        CASE
-                            WHEN mk.tgl_awal is not null THEN 'Sudah Terisi'
-                            else 'Kosong'
-                        END as status_kamar,
-                        us.name,
-                        us.handphone,
-                        mk.user_id,
-                        concat(mk.tgl_awal,' SD ',mk.tgl_akhir) as durasi,
-                        CONVERT(mk.tgl_awal,date) tgl_awal,
-                        CONVERT(mk.tgl_akhir,date) tgl_akhir,
-                        DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) as sisa_durasi,
-                        count(fsper.fasilitas) countperbaikan
-                    ";
-                    
-                    $table = "
-                        kamar k
-                        LEFT JOIN mapping_kamar mk ON k.id = mk.id_kamar
-                        LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
-                        LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id AND fs.penyedia = 'pihak kos'
-                        LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id AND fsp.penyedia = 'penghuni'
-                        LEFT JOIN fasilitas fsper ON mf.id_fasilitas = fsper.id AND fsper.penyedia = 'pihak kos' AND mf.status = 'perbaikan'
-                        LEFT JOIN tipe_kamar tk ON mk.id_tipe = tk.id
-                        LEFT JOIN users us ON mk.user_id = us.id
-                    ";
-
-                    $where = " 
-                        k.id is not null
-                    ";
-                    $status     = $request->status ;
-                    $kondisi    = $request->kondisi ;
-                    if($status == 1){
-                        $where .="
-                             AND mk.user_id is not null
-                        ";
-                    }elseif($status == 2){
-                         $where .="
-                             AND mk.user_id is null
-                        ";
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
                     }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
 
-                    
-                    $where .= " 
-                        GROUP BY
-                        k.id,
-                        k.lantai,
-                        k.no_kamar,
-                        k.status,
-                        k.harga,
-                        mk.tgl_awal,
-                        us.name,
-                        us.handphone,
-                        mk.tgl_awal,
-                        mk.tgl_akhir,
-                        mk.user_id,
-                        tk.tipe
-                        ORDER BY k.no_kamar asc
-                    ";
+            return $MasterClass->Results($results);
 
-                    if($kondisi ){
-                        $table = " ( select ".$select." from ".$table." where ".$where." ) a" ;
-                        $select = " * ";
-                        if($kondisi == 1){
-                            $where =" countperbaikan = 0";
-                        }elseif($kondisi == 2){
-                            $where =" countperbaikan >= 1";
+        }
+        public function getPenghuniList(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+                        
+                        $status = [];
+                        
+                        $select = "
+                            us.id,
+                            us.name,
+                            us.email,
+                            us.handphone,
+                                case 
+                                    when us.is_active = '1' then 'ACTIVE' 
+                                    when us.is_active = '2' then 'INACTIVE' 
+                                end status_name,
+                            us.is_active,
+                            us.role_id,
+                            ur.role_name 
+                        ";
+                        
+                        $table = '
+                            users us
+                            LEFT JOIN users_roles ur ON us.role_id = ur.id
+                        ';
+                        $where = " ur.role_name like  'penghuni' ";
+                        $result = $MasterClass->selectGlobal($select,$table,$where);
+                        
+                        $results = [
+                            'code'  => $result['code'],
+                            'info'  => $result['info'],
+                            'data'  => $result['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function getListKamar(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+                        
+                        $status = [];
+                        
+                        $select = "
+                            k.id,
+                            k.lantai,
+                            k.no_kamar,
+                            k.status,
+                            k.harga,
+                            tk.tipe,
+                            GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
+                            GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp,
+                            GROUP_CONCAT(fsper.fasilitas SEPARATOR ',') as perbaikan,
+                            GROUP_CONCAT(fs.id SEPARATOR ',') as idfaskos,
+                            GROUP_CONCAT(fsp.id SEPARATOR ',') as idfaskosp,
+                            GROUP_CONCAT(fsper.id SEPARATOR ',') as idperbaikan,
+                            CASE 
+                                WHEN ur.role_name = 'guest' THEN 'Booking'
+                                ELSE
+                                    CASE
+                                        WHEN mk.tgl_awal is not null THEN 'Sudah Terisi'
+                                        ELSE 'Kosong'
+                                    END
+                            END as status_kamar,
+                            us.name,
+                            us.handphone,
+                            ur.role_name,
+                            mk.user_id,
+                            concat(mk.tgl_awal,' SD ',mk.tgl_akhir) as durasi,
+                            CONVERT(mk.tgl_awal,date) tgl_awal,
+                            CONVERT(mk.tgl_akhir,date) tgl_akhir,
+                            DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) as sisa_durasi,
+                            count(fsper.fasilitas) countperbaikan
+                        ";
+                        
+                        $table = "
+                            kamar k
+                            LEFT JOIN mapping_kamar mk ON k.id = mk.id_kamar
+                            LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
+                            LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id AND fs.penyedia = 'pihak kos'
+                            LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id AND fsp.penyedia = 'penghuni'
+                            LEFT JOIN fasilitas fsper ON mf.id_fasilitas = fsper.id AND fsper.penyedia = 'pihak kos' AND mf.status = 'perbaikan'
+                            LEFT JOIN tipe_kamar tk ON mk.id_tipe = tk.id
+                            LEFT JOIN users us ON mk.user_id = us.id
+                            LEFT JOIN users_roles ur ON ur.id = us.role_id
+                        ";
+
+                        $where = " 
+                            k.id is not null
+                        ";
+                        $status     = $request->status ;
+                        $kondisi    = $request->kondisi ;
+                        if($status == 1){
+                            $where .="
+                                AND mk.user_id is not null
+                            ";
+                        }elseif($status == 2){
+                            $where .="
+                                AND mk.user_id is null
+                            ";
+                        }elseif($status == 3){
+                            $where .="
+                                AND mk.user_id is not  null and ur.role_name = 'guest'
+                            ";
                         }
+
+                        
+                        $where .= " 
+                            GROUP BY
+                            k.id,
+                            k.lantai,
+                            k.no_kamar,
+                            k.status,
+                            k.harga,
+                            mk.tgl_awal,
+                            us.name,
+                            us.handphone,
+                            ur.role_name,
+                            mk.tgl_awal,
+                            mk.tgl_akhir,
+                            mk.user_id,
+                            tk.tipe
+                            ORDER BY k.no_kamar asc
+                        ";
+
+                        if($kondisi ){
+                            $table = " ( select ".$select." from ".$table." where ".$where." ) a" ;
+                            $select = " * ";
+                            if($kondisi == 1){
+                                $where =" countperbaikan = 0";
+                            }elseif($kondisi == 2){
+                                $where =" countperbaikan >= 1";
+                            }
+                        }
+                        $result = $MasterClass->selectGlobal($select,$table,$where);
+                        
+                        $results = [
+                            'code'  => $result['code'],
+                            'info'  => $result['info'],
+                            'data'  => $result['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
                     }
-                    $result = $MasterClass->selectGlobal($select,$table,$where);
-                    
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
                     $results = [
-                        'code'  => $result['code'],
-                        'info'  => $result['info'],
-                        'data'  => $result['data'],
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
                     ];
-                        
         
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
                 }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
             }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function getListFasilitas(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            else {
         
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
 
-                    DB::beginTransaction();     
-                    
-                    $status = [];
-                    
-                    $select = "
-                        f.*
-                    ";
-                    
-                    $table = '
-                        fasilitas f
-                    ';
-                    // $where = " ur.role_name like  'penghuni' ";
-                    $result = $MasterClass->selectGlobal($select,$table);
-                    
-                    $results = [
-                        'code'  => $result['code'],
-                        'info'  => $result['info'],
-                        'data'  => $result['data'],
-                    ];
+            return $MasterClass->Results($results);
+
+        }
+        public function getListFasilitas(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
                         
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function getPenghuni(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    $data = json_decode($request->getContent());
-
-                    
-                    DB::beginTransaction();
-            
-                    $status = [];
-  
-                    $saved = DB::select("SELECT us.* FROM users us
-                            LEFT JOIN users_roles ur ON us.role_id = ur.id 
-                            where 
-                            ur.role_name like  'penghuni' ");
-                    $saved = $MasterClass->checkErrorModel($saved);
-                    
-                    $status = $saved;
- 
-                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
-                    //     DB::commit();
-                    // }else{
-                    //     DB::rollBack();
-                    // }
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
+                        $status = [];
                         
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function getTipeKamar(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    $data = json_decode($request->getContent());
-
-                    
-                    DB::beginTransaction();
-            
-                    $status = [];
-  
-                    $saved = DB::select("SELECT * FROM tipe_kamar ");
-                    $saved = $MasterClass->checkErrorModel($saved);
-                    
-                    $status = $saved;
- 
-                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
-                    //     DB::commit();
-                    // }else{
-                    //     DB::rollBack();
-                    // }
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
+                        $select = "
+                            f.*
+                        ";
                         
-        
-        
-                } else {
+                        $table = '
+                            fasilitas f
+                        ';
+                        // $where = " ur.role_name like  'penghuni' ";
+                        $result = $MasterClass->selectGlobal($select,$table);
+                        
+                        $results = [
+                            'code'  => $result['code'],
+                            'info'  => $result['info'],
+                            'data'  => $result['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
                     $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
                     ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function getFasilitas(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
         
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
 
-                    DB::beginTransaction();
+            return $MasterClass->Results($results);
+
+        }
+        public function getPenghuni(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
             
-                    $status = [];
-                    
-                    if($request->kamar){
-                        $where = "inner join mapping_fasilitas b on a.id= b.id_fasilitas where b.id_kamar = $request->kamar and a.penyedia= 'pihak kos'";
-                    }else{
-                        if($request->jenis == 'kos'){
-                            $where = "where penyedia= 'pihak kos'";
-                        }elseif($request->jenis == 'penghuni'){
-                            $where = "where penyedia= 'penghuni'";
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        $data = json_decode($request->getContent());
+
+                        
+                        DB::beginTransaction();
+                
+                        $status = [];
+    
+                        $saved = DB::select("SELECT us.* FROM users us
+                                LEFT JOIN users_roles ur ON us.role_id = ur.id 
+                                where 
+                                ur.role_name like  'penghuni' ");
+                        $saved = $MasterClass->checkErrorModel($saved);
+                        
+                        $status = $saved;
+    
+                        // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                        //     DB::commit();
+                        // }else{
+                        //     DB::rollBack();
+                        // }
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function getTipeKamar(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        $data = json_decode($request->getContent());
+
+                        
+                        DB::beginTransaction();
+                
+                        $status = [];
+    
+                        $saved = DB::select("SELECT * FROM tipe_kamar ");
+                        $saved = $MasterClass->checkErrorModel($saved);
+                        
+                        $status = $saved;
+    
+                        // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                        //     DB::commit();
+                        // }else{
+                        //     DB::rollBack();
+                        // }
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function getFasilitas(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();
+                
+                        $status = [];
+                        
+                        if($request->kamar){
+                            $where = "inner join mapping_fasilitas b on a.id= b.id_fasilitas where b.id_kamar = $request->kamar and a.penyedia= 'pihak kos'";
                         }else{
-                            $where = '';
+                            if($request->jenis == 'kos'){
+                                $where = "where penyedia= 'pihak kos'";
+                            }elseif($request->jenis == 'penghuni'){
+                                $where = "where penyedia= 'penghuni'";
+                            }else{
+                                $where = '';
+                            }
                         }
-                    }
-                    $saved = DB::select("SELECT a.* FROM fasilitas a $where");
-                    $saved = $MasterClass->checkErrorModel($saved);
-                    
-                    $status = $saved;
- 
-                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
-                    //     DB::commit();
-                    // }else{
-                    //     DB::rollBack();
-                    // }
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
+                        $saved = DB::select("SELECT a.* FROM fasilitas a $where");
+                        $saved = $MasterClass->checkErrorModel($saved);
                         
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
+                        $status = $saved;
     
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
+                        // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                        //     DB::commit();
+                        // }else{
+                        //     DB::rollBack();
+                        // }
             
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function getListTipeKamar(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    DB::beginTransaction();     
-                    
-                    $status = [];
-                    
-                    $select = "
-                        tk.*
-                    ";
-                    
-                    $table = '
-                        tipe_kamar tk
-                    ';
-                    // $where = " ur.role_name like  'penghuni' ";
-                    $result = $MasterClass->selectGlobal($select,$table);
-                    
-                    $results = [
-                        'code'  => $result['code'],
-                        'info'  => $result['info'],
-                        'data'  => $result['data'],
-                    ];
-                        
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
             
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function listKamarDashboard(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    DB::beginTransaction();     
-                    $idlogin    = strtolower($MasterClass->getSession('user_id'));
-                    $rolelogin  = strtolower($MasterClass->getSession('role_name'));
-                    $status = [];
-                    
-                    $select = "
-                        k.id,
-                        k.lantai,
-                        k.no_kamar,
-                        GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
-                        GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp,
-                        CASE
-                            WHEN mk.tgl_awal is not null THEN 'Sudah Terisi'
-                            else 'Kosong'
-                        END as status_kamar,
-                        us.name,
-                        mk.user_id,
-                        concat(mk.tgl_awal,' SD ',mk.tgl_akhir) as durasi,
-                        mk.tgl_awal,
-                        mk.tgl_akhir,
-                        DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) as sisa_durasi,
-                        tk.tipe,
-                        us.handphone,
-                        sum(fsp.biaya)+k.harga as biaya,
-                        sum(fsp.biaya) as biayatambah,k.harga,
-                        ht.id as status_transaksi,
-                        ht.created_at as tgltransaksi,
-                        ht.total_biaya totaltransaksi,
-                        ht.tgl_awal tgltransaksi1,
-                        ht.tgl_akhir tgltransaksi2,
-                        ht.name nametransaksi,
-                        ht.biaya_kamar biayatransaksi,
-                        ht.biaya_tambahan biayatambahtransaksi,
-                        ht.tipe tipetransaksi,
-                        ht.no_kamar kamartransaksi,
-                        ht.jml_bulan blntransaksi,
-                        ht.handphone hptranaksi
-                    ";
-                    
-                    $table = "
-                        kamar k
-                        LEFT JOIN mapping_kamar mk ON k.id = mk.id_kamar
-                        LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
-                        LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id and fs.penyedia = 'pihak kos'
-                        LEFT JOIN tipe_kamar tk ON mk.id_tipe = tk.id
-                        LEFT JOIN users us ON mk.user_id = us.id
-                        LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id and fsp.penyedia = 'penghuni'
-                        LEFT JOIN history_transaksi ht ON ht.user_id = mk.user_id AND ht.tgl_awal = mk.tgl_awal
-                            AND ht.tgl_akhir = mk.tgl_akhir
-                    ";
-                    $where = " 
-                        mk.user_id is not null
-                    ";
-                    $sisawaktu = $request->sisawaktu ;
-                    $statusbayar = $request->status ;
-                    if($rolelogin != 'superadmin' && $rolelogin != 'penjaga' && $rolelogin != 'pemilik'){
-                        $where  .=" AND us.id = $idlogin ";
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
                     }
-                    if($sisawaktu){
-                        $where .="
-                            AND DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) $sisawaktu 
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function getListTipeKamar(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+                        
+                        $status = [];
+                        
+                        $select = "
+                            tk.*
                         ";
+                        
+                        $table = '
+                            tipe_kamar tk
+                        ';
+                        // $where = " ur.role_name like  'penghuni' ";
+                        $result = $MasterClass->selectGlobal($select,$table);
+                        
+                        $results = [
+                            'code'  => $result['code'],
+                            'info'  => $result['info'],
+                            'data'  => $result['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
                     }
-                    if($statusbayar == '0'){
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function listKamarDashboard(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+                        $idlogin    = strtolower($MasterClass->getSession('user_id'));
+                        $rolelogin  = strtolower($MasterClass->getSession('role_name'));
+                        $status = [];
                         
-                        $where .=" AND ht.id is null";
-                    }elseif($statusbayar == '1'){
-                        $where .=" AND ht.id is not null";
+                        $select = "
+                            k.id,
+                            k.lantai,
+                            k.no_kamar,
+                            GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
+                            GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp,
+                            CASE
+                                WHEN mk.tgl_awal is not null THEN 'Sudah Terisi'
+                                else 'Kosong'
+                            END as status_kamar,
+                            us.name,
+                            mk.user_id,
+                            concat(mk.tgl_awal,' SD ',mk.tgl_akhir) as durasi,
+                            mk.tgl_awal,
+                            mk.tgl_akhir,
+                            DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) as sisa_durasi,
+                            tk.tipe,
+                            us.handphone,
+                            sum(fsp.biaya)+k.harga as biaya,
+                            sum(fsp.biaya) as biayatambah,k.harga,
+                            ht.id as status_transaksi,
+                            ht.created_at as tgltransaksi,
+                            ht.total_biaya totaltransaksi,
+                            ht.tgl_awal tgltransaksi1,
+                            ht.tgl_akhir tgltransaksi2,
+                            ht.name nametransaksi,
+                            ht.biaya_kamar biayatransaksi,
+                            ht.biaya_tambahan biayatambahtransaksi,
+                            ht.tipe tipetransaksi,
+                            ht.no_kamar kamartransaksi,
+                            ht.jml_bulan blntransaksi,
+                            ht.handphone hptranaksi
+                        ";
+                        
+                        $table = "
+                            kamar k
+                            LEFT JOIN mapping_kamar mk ON k.id = mk.id_kamar
+                            LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
+                            LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id and fs.penyedia = 'pihak kos'
+                            LEFT JOIN tipe_kamar tk ON mk.id_tipe = tk.id
+                            LEFT JOIN users us ON mk.user_id = us.id
+                            LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id and fsp.penyedia = 'penghuni'
+                            LEFT JOIN history_transaksi ht ON ht.user_id = mk.user_id AND ht.tgl_awal = mk.tgl_awal
+                                AND ht.tgl_akhir = mk.tgl_akhir
+                        ";
+                        $where = " 
+                            mk.user_id is not null
+                        ";
+                        $sisawaktu = $request->sisawaktu ;
+                        $statusbayar = $request->status ;
+                        if($rolelogin != 'superadmin' && $rolelogin != 'penjaga' && $rolelogin != 'pemilik'){
+                            $where  .=" AND us.id = $idlogin ";
+                        }
+                        if($sisawaktu){
+                            $where .="
+                                AND DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) $sisawaktu 
+                            ";
+                        }
+                        if($statusbayar == '0'){
+                            
+                            $where .=" AND ht.id is null";
+                        }elseif($statusbayar == '1'){
+                            $where .=" AND ht.id is not null";
+                        }
+                        $where .= " GROUP BY
+                            k.id,
+                            k.lantai,
+                            k.no_kamar,
+                            mk.tgl_awal,
+                            mk.user_id,
+                            us.name,
+                            mk.tgl_awal,
+                            mk.tgl_akhir,
+                            tk.tipe,
+                            us.handphone,
+                            k.harga,
+                            ht.id,
+                            ht.created_at,
+                            ht.total_biaya,
+                            ht.tgl_awal,
+                            ht.tgl_akhir,
+                            ht.name,
+                            ht.biaya_kamar,
+                            ht.biaya_tambahan,
+                            ht.tipe,
+                            ht.no_kamar,
+                            ht.jml_bulan,
+                            ht.handphone
+                            ORDER BY mk.tgl_akhir asc
+                        ";
+
+                        // print_r($where);die;;
+                        $result = $MasterClass->selectGlobal($select,$table,$where);
+                        
+                        $results = [
+                            'code'  => $result['code'],
+                            'info'  => $result['info'],
+                            'data'  => $result['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
                     }
-                    $where .= " GROUP BY
-                        k.id,
-                        k.lantai,
-                        k.no_kamar,
-                        mk.tgl_awal,
-                        mk.user_id,
-                        us.name,
-                        mk.tgl_awal,
-                        mk.tgl_akhir,
-                        tk.tipe,
-                        us.handphone,
-                        k.harga,
-                        ht.id,
-                        ht.created_at,
-                        ht.total_biaya,
-                        ht.tgl_awal,
-                        ht.tgl_akhir,
-                        ht.name,
-                        ht.biaya_kamar,
-                        ht.biaya_tambahan,
-                        ht.tipe,
-                        ht.no_kamar,
-                        ht.jml_bulan,
-                        ht.handphone
-                        ORDER BY mk.tgl_akhir asc
-                    ";
-
-                    // print_r($where);die;;
-                    $result = $MasterClass->selectGlobal($select,$table,$where);
-                    
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
                     $results = [
-                        'code'  => $result['code'],
-                        'info'  => $result['info'],
-                        'data'  => $result['data'],
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
                     ];
-                        
         
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
                 }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
             }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function listTransaksi(Request $request){
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            else {
         
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
 
-                    
-                    $idlogin    = strtolower($MasterClass->getSession('user_id'));
-                    $rolelogin  = strtolower($MasterClass->getSession('role_name'));
-                    
-                    DB::beginTransaction();     
-                    
-                    $status = [];
-                    
-                    $select = "
-                        ht.*
-                    ";
-                    
-                    $table = "
-                       history_transaksi ht
-                    ";
-                    $where = " 
-                        ht.user_id is not null 
-                    ";
-                    if($rolelogin != 'superadmin' && $rolelogin != 'penjaga' && $rolelogin != 'pemilik'){
-                        $where  .=" AND ht.user_id = $idlogin ";
+            return $MasterClass->Results($results);
+
+        }
+        public function listTransaksi(Request $request){
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        
+                        $idlogin    = strtolower($MasterClass->getSession('user_id'));
+                        $rolelogin  = strtolower($MasterClass->getSession('role_name'));
+                        
+                        DB::beginTransaction();     
+                        
+                        $status = [];
+                        
+                        $select = "
+                            ht.*
+                        ";
+                        
+                        $table = "
+                        history_transaksi ht
+                        ";
+                        $where = " 
+                            ht.user_id is not null 
+                        ";
+                        if($rolelogin != 'superadmin' && $rolelogin != 'penjaga' && $rolelogin != 'pemilik'){
+                            $where  .=" AND ht.user_id = $idlogin ";
+                        }
+                        $where .= " 
+                        order by created_at desc
+                        ";
+                        $result = $MasterClass->selectGlobal($select,$table,$where);
+                        
+                        $results = [
+                            'code'  => $result['code'],
+                            'info'  => $result['info'],
+                            'data'  => $result['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
                     }
-                    $where .= " 
-                    order by created_at desc
-                    ";
-                    $result = $MasterClass->selectGlobal($select,$table,$where);
-                    
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
                     $results = [
-                        'code'  => $result['code'],
-                        'info'  => $result['info'],
-                        'data'  => $result['data'],
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
                     ];
-                        
         
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
                 }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
             }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function getfotokamar(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            else {
         
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function getfotokamar(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+                        
+                        DB::beginTransaction();
+                
+                        $status = [];
+    
+                        $saved = DB::select("SELECT * FROM foto_kamar where id_kamar = ".$request->id);
+                        $saved = $MasterClass->checkErrorModel($saved);
+                        
+                        $status = $saved;
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function cekdatakamar(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();
+                        
+                        $id     = $request->id ;
+                        $status = [];
+                        
+                        $select = "
+                            k.id as idkamar,k.no_kamar,k.lantai,k.harga,
+                            GROUP_CONCAT(f.fasilitas SEPARATOR ',') as faskos,
+                            tk.tipe,tk.id as idtipe
+                        ";
+                        $from   = " 
+                            kamar k 
+                            join mapping_kamar mk on mk.id_kamar = k.id
+                            join mapping_fasilitas mf on mf.id_kamar = k.id
+                            join fasilitas f on f.id = mf.id_fasilitas and f.penyedia = 'pihak kos'
+                            join tipe_kamar tk on tk.id = mk.id_tipe
+                        ";
+                        $where = " k.id = $id and mk.user_id is null";
+                        $where .="
+                            GROUP BY 
+                            k.id,k.no_kamar,k.lantai,k.harga,
+                            tk.tipe,tk.id
+                        ";
+                        // print_r("SELECT $select FROM $from WHERE $where");die;
+                        $saved = DB::select("SELECT $select FROM $from WHERE $where");
+                        $saved = $MasterClass->checkErrorModel($saved);
+                        
+                        $status = $saved;
+    
+                        // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                        //     DB::commit();
+                        // }else{
+                        //     DB::rollBack();
+                        // }
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function tipeKamar(Request $request){
+
+            $data = json_decode($request->getContent());
+
+            DB::beginTransaction();
+
+            $status = [];
+
+            $saved = DB::select("SELECT * FROM tipe_kamar ");
+
+            // if($status['code'] == $MasterClass::CODE_SUCCESS){
+            //     DB::commit();
+            // }else{
+            //     DB::rollBack();
+            // }
+
+            $results = [
+                'code' => '0',
+                'info'  => 'ok',
+                'data'  =>  $saved,
+            ];
+
+            return $results;
+        }
+        public function listkamaravailable(Request $request){
+
+            $MasterClass = new Master();
+
             try {
-                if ($request->isMethod('post')) {
+                DB::beginTransaction();
                     
-                    DB::beginTransaction();
-            
-                    $status = [];
-  
-                    $saved = DB::select("SELECT * FROM foto_kamar where id_kamar = ".$request->id);
-                    $saved = $MasterClass->checkErrorModel($saved);
+                $status = [];
+                
+                $select = "
+                    k.id as idkamar,k.no_kamar,k.lantai,k.harga,
+                    GROUP_CONCAT(f.fasilitas SEPARATOR ',') as faskos,
+                    tk.tipe,tk.id as idtipe,fk.alamat,fk.file,fk.jenis
+                ";
+                $from   = " 
+                    kamar k 
+                    join mapping_kamar mk on mk.id_kamar = k.id
+                    join mapping_fasilitas mf on mf.id_kamar = k.id
+                    join fasilitas f on f.id = mf.id_fasilitas and f.penyedia = 'pihak kos'
+                    join tipe_kamar tk on tk.id = mk.id_tipe
+                    join foto_kamar fk on fk.id_kamar = k.id and fk.jenis='sampul'
+                ";
+                $where = " mk.user_id is null";
+                $where .="
+                    GROUP BY 
+                    k.id,k.no_kamar,k.lantai,k.harga,
+                    tk.tipe,tk.id,fk.alamat,fk.file,fk.jenis
+                ";
+                $saved = DB::select("SELECT $select FROM $from WHERE $where");
+                $saved = $MasterClass->checkErrorModel($saved);
+                
+                $status = $saved;
+
+                // if($status['code'] == $MasterClass::CODE_SUCCESS){
+                //     DB::commit();
+                // }else{
+                //     DB::rollBack();
+                // }
+    
+                $results = [
+                    'code' => $status['code'],
+                    'info'  => $status['info'],
+                    'data'  =>  $status['data'],
+                ];
                     
-                    $status = $saved;
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
-                        
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
             } catch (\Exception $e) {
                 // Roll back the transaction in case of an exception
                 $results = [
@@ -1266,99 +1447,10 @@ class JsonDataController extends Controller
                 ];
     
             }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
             
+            return $MasterClass->Results($results);
+
         }
-
-        return $MasterClass->Results($results);
-
-    }
-    public function cekdatakamar(Request $request){
-
-        $MasterClass = new Master();
-
-        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
-        
-        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
-            try {
-                if ($request->isMethod('post')) {
-
-                    DB::beginTransaction();
-                    
-                    $id     = $request->id ;
-                    $status = [];
-                    
-                    $select = "
-                        k.id as idkamar,k.no_kamar,k.lantai,k.harga,
-                        GROUP_CONCAT(f.fasilitas SEPARATOR ',') as faskos,
-                        tk.tipe
-                    ";
-                    $from   = " 
-                        kamar k 
-                        join mapping_kamar mk on mk.id_kamar = k.id
-                        join mapping_fasilitas mf on mf.id_kamar = k.id
-                        join fasilitas f on f.id = mf.id_fasilitas and f.penyedia = 'pihak kos'
-                        join tipe_kamar tk on tk.id = mk.id_tipe
-                    ";
-                    $where = " k.id = $id and mk.user_id is null";
-                    $where .="
-                        GROUP BY 
-                        k.id,k.no_kamar,k.lantai,k.harga,
-                        tk.tipe
-                    ";
-                    // print_r("SELECT $select FROM $from WHERE $where");die;
-                    $saved = DB::select("SELECT $select FROM $from WHERE $where");
-                    $saved = $MasterClass->checkErrorModel($saved);
-                    
-                    $status = $saved;
- 
-                    // if($status['code'] == $MasterClass::CODE_SUCCESS){
-                    //     DB::commit();
-                    // }else{
-                    //     DB::rollBack();
-                    // }
-        
-                    $results = [
-                        'code' => $status['code'],
-                        'info'  => $status['info'],
-                        'data'  =>  $status['data'],
-                    ];
-                        
-        
-        
-                } else {
-                    $results = [
-                        'code' => '103',
-                        'info'  => "Method Failed",
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Roll back the transaction in case of an exception
-                $results = [
-                    'code' => '102',
-                    'info'  => $e->getMessage(),
-                ];
-    
-            }
-        }
-        else {
-    
-            $results = [
-                'code' => '403',
-                'info'  => "Unauthorized",
-            ];
-            
-        }
-
-        return $MasterClass->Results($results);
-
-    }
     //CRUD FUNCTION
         public function saveUser(Request $request){
 
@@ -2346,15 +2438,24 @@ class JsonDataController extends Controller
         }
         public function savebooking(Request $request){
             $MasterClass = new Master();
-            Session::get('user_id');
             $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));            
             if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
                 try {
                     if ($request->isMethod('post')) {
 
                         DB::beginTransaction();
-                        $id                 = $request->idkamar;                        
                         $penghuni           = $MasterClass->getSession('user_id');
+                        
+                        $cekdata = DB::select("SELECT * FROM mapping_kamar mk WHERE mk.user_id = $penghuni");
+                        if($cekdata){
+                            DB::rollBack();
+                            $results = [
+                                'code' => '1',
+                                'info' => "Anda sudah booking kamar,silahkan untuk menghubungi pihak kos lewat WA",
+                            ];
+                            return $MasterClass->Results($results);
+                        }
+                        $id                 = $request->idkamar;                        
                         $durasi             = $request->tanggal;
                         $jmlbulan           = $request->bulan;
                         $tipekamar          = $request->tipe;
@@ -2367,13 +2468,15 @@ class JsonDataController extends Controller
                         $now                = date('Y-m-d H:i:s');
                         $attrmapping     = [
                             'user_id'       => $penghuni,
-                            'id_kamar'      => $id,
                             'id_tipe'       => $tipekamar,
                             'tgl_awal'      => $tglawal,
                             'tgl_akhir'     => $tglakhir,
-                            'created_at'    => $now,
+                            'updated_at'    => $now,
                         ];
-                        $savedmapping      = $MasterClass->saveGlobal('mapping_kamar', $attrmapping );
+                        $where     = [
+                            'id_kamar'      => $id
+                        ];
+                        $savedmapping      = $MasterClass->updateGlobal('mapping_kamar', $attrmapping,$where );
                         if($savedmapping['code'] != $MasterClass::CODE_SUCCESS){
                             DB::rollBack();
                             $results = [
@@ -2388,6 +2491,66 @@ class JsonDataController extends Controller
                             'code'  => $MasterClass::CODE_SUCCESS,
                             'info'  => 'ok',
                         ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function setujuibooking(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $data = json_decode($request->getContent());
+                        $status = [];
+                        
+                        $saved      = DB::update("UPDATE users us set role_id = (select id from users_roles where role_name='penghuni') where id= $data->id ");
+                        $status     = $saved;
+                        if($status == 1){
+                            DB::commit();
+                            
+                            $results = [
+                                'code' => '0',
+                                'info'  => 'ok',
+                            ];
+                        }else{
+                            $results = [
+                                'code' => '1',
+                                'info'  => 'Gagal Setujui Booking',
+                            ];
+                        }
+                            
             
             
                     } else {

@@ -209,7 +209,7 @@ class Master
             ";
         }
 
-        // dd($query);
+        // dd($query);die;
         $select = DB::select($query);
         $select = $this->checkErrorModel($select);
 
@@ -340,5 +340,26 @@ class Master
 
         return $results;
     }
+    
+    public function compressImage($source_image = null, $compress_image = null, $quality = null) {
+
+        if ($quality == null){
+            $quality = 10;
+        }
+
+		$image_info = getimagesize($source_image);	
+		if ($image_info['mime'] == 'image/jpeg') { 
+			$source_image = imagecreatefromjpeg($source_image);
+			$image = imagejpeg($source_image, $compress_image, $quality);
+		} elseif ($image_info['mime'] == 'image/gif') {
+			$source_image = imagecreatefromgif($source_image);
+			$image = imagegif($source_image, $compress_image, $quality);
+		} elseif ($image_info['mime'] == 'image/png') {
+			$source_image = imagecreatefrompng($source_image);
+			$image = imagepng($source_image, $compress_image, $quality);
+		}	   
+		return $compress_image;
+        
+	}
 }
 
