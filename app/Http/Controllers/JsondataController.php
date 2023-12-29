@@ -2309,9 +2309,15 @@ class JsonDataController extends Controller
                         $harga              = $request->harga;
                         $biayatambah        = $request->biayatambah;
                         $biaya              = $request->biaya;
+                        $jenispembayaran    = $request->jenispembayaran;
+                        if($jenispembayaran == '1'){
+                            $jmlbulan           = 1 ;
+                            $tgl_akhir          = date("Y-m-d", strtotime("+1 month", strtotime($tgl_awal)));
+                        }else{
+                            $tgl_awal           = date("Y-m-d", strtotime("+".$jmlbulan." month", strtotime($tgl_awal)));
+                            $tgl_akhir          = date("Y-m-d", strtotime("+".$jmlbulan." month", strtotime($tgl_awal)));
+                        }
 
-                        $tgl_awal           = date("Y-m-d", strtotime("+".$jmlbulan." month", strtotime($tgl_awal)));
-                        $tgl_akhir          = date("Y-m-d", strtotime("+".$jmlbulan." month", strtotime($tgl_awal)));
                          if($user_id == '' || $user_id == null || $user_id == 'undefined'){//ngebaca yg upload apakah admin / penghuni
                             $user_id = $MasterClass->getSession('user_id') ; 
                          }
@@ -2399,8 +2405,6 @@ class JsonDataController extends Controller
                             }
 
                         }
-
-                            
 
                         DB::commit();
                         $results = [
@@ -2550,6 +2554,69 @@ class JsonDataController extends Controller
                                 'info'  => 'Gagal Setujui Booking',
                             ];
                         }
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function deleteTransaksi(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $data = json_decode($request->getContent());
+                        
+                        $status = [];
+
+                        $where     = [
+                                'id' => $data->id
+                        ];
+                        $saved      = $MasterClass->deleteGlobal('history_transaksi', $where );
+                        
+                        $status = $saved;
+    
+                        if($status['code'] == $MasterClass::CODE_SUCCESS){
+                            DB::commit();
+                        }else{
+                            DB::rollBack();
+                        }
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                        ];
                             
             
             

@@ -40,6 +40,17 @@ $.extend($.fn.dataTable.defaults, {
 });
 
 $('.select2').select2();
+$("#form-pembayaran").select2({
+    dropdownParent: $("#modal-update"),
+});
+
+$("#form-pembayaran").on('change',function(){
+    if($("#form-pembayaran").val() == '1'){
+        $(".divbln").hide();
+    }else{
+        $(".divbln").show();
+    }
+});
 
 $("#filter-btn").on('click',function(e){
     	
@@ -328,13 +339,16 @@ function editdata(p){
 
 function savebukti() {
     let jmlbulan    = $("#form-bln").val() ; 
+    let jenispembayaran = $("#form-pembayaran").val();
     if($("#form-bukti").val() == ''){
         swalwarning('Bukti tidak boleh kosong');
         return false ;
     }
-    if(jmlbulan <= 0){
-        swalwarning('Jumlah Bulan minimal 1 bulan');
-        return false ;
+    if(jenispembayaran != '1'){
+        if(jmlbulan <= 0){
+            swalwarning('Jumlah Bulan minimal 1 bulan');
+            return false ;
+        }
     }
     const formData    = new FormData(document.getElementById("formbukti"));
     formData.append('idkamar',dataedit.id);
@@ -350,6 +364,7 @@ function savebukti() {
     formData.append('biayatambah',dataedit.biayatambah);
     formData.append('jmlbulan',jmlbulan);
     formData.append('biaya',dataedit.biaya * jmlbulan);
+    formData.append('jenispembayaran',jenispembayaran);
 
     $.ajax({
         url: baseURL + "/saveBukti",

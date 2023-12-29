@@ -103,6 +103,16 @@
                             </div>
                         </div>
                         <div class="mb-3 row">
+                            <label  class="col-sm-3 col-form-label">Jenis Pembayaran</label>
+                            <div class="col-sm-9">
+
+                                <select id="form-pembayaran" name="form-pembayaran" class="select2 ">
+                                    <option value="1">Pembayaran Pertama</option>
+                                    <option value="2">Bukan Pembayaran Pertama</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3 row divbln" style="display:none">
                             <label class="col-sm-3 col-form-label">Jml Bulan (*)</label>
                             <div class="col-sm-9">
                                 <input id="form-bln" name="form-bln" type="number" class="form-control" min="1">

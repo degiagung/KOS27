@@ -83,7 +83,7 @@ function getListData() {
             paginate    : { 'first': 'First', 'last': 'Last', 'next': '&rarr;', 'previous': '&larr;' }
         },
         buttons: [
-                
+
             { 
                 className: 'btnreload',
                 text: '<i class="bi bi-arrow-clockwise" ></li>',
@@ -131,6 +131,11 @@ function getListData() {
                 return `<a style="cursor:pointer;color:red;" class="showbill" >Klik Disini</a>`
             }
             },
+            { mRender: function (data, type, row) {
+                $rowData = `<button type="button" class="btn btn-danger btn-icon-sm delete-btn"><i class="bi bi-x-square"></i></button>`;
+                return $rowData;
+            }
+            },
             
         ],
         drawCallback: function (settings) {
@@ -160,6 +165,13 @@ function getListData() {
                 .find(".showbilln")
                 .on("click", function () {
                     swalwarning('Penghuni Belum Bayar');
+                });
+            $(rows)
+                .find(".delete-btn")
+                .on("click", function () {
+                    var tr = $(this).closest("tr");
+                    var rowData = dtpr.row(tr).data();
+                    deleteData(rowData);
                 });
         },
     });
@@ -271,7 +283,6 @@ function editdata(p){
 }
 
 function savebukti() {
-    console.log(dataedit);
     const formData    = new FormData(document.getElementById("formbukti"));
     formData.append('idkamar',dataedit.id);
     formData.append('user_id',dataedit.user_id);
@@ -314,5 +325,57 @@ function savebukti() {
         error: function (xhr, status, error) {
             sweetAlert("Oops...", "ERROR", "ERROR");
         },
+    });
+}
+
+function deleteData(data) {
+    swal({
+        title: "Apakah Yakin untuk mendelete ?",
+        text: "Data tidak dapat di kembalikan",
+        type: "warning",
+        showCancelButton: !0,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Ya, Delete !!",
+        cancelButtonText: "Tidak,Batalkan !!",
+        closeOnConfirm: !1,
+        closeOnCancel: !1,
+    }).then(function (e) {
+        if (e.value) {
+            $.ajax({
+                url: baseURL + "/deleteTransaksi",
+                type: "POST",
+                data: JSON.stringify({ id: data.id }),
+                dataType: "json",
+                contentType: "application/json",
+                beforeSend: function () {
+                    Swal.fire({
+                        title: "Loading",
+                        text: "Please wait...",
+                    });
+                },
+                complete: function () {
+                    $('#table-list').DataTable().ajax.reload();
+                },
+                success: function (response) {
+                    // Handle response sukses
+                    if (response.code == 0) {
+                        swal("Berhasil Delete !", '', "success");
+                    } else {
+                        sweetAlert("Oops...", response.info, "ERROR");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Handle error response
+                    // console.log("ERROR");
+                    sweetAlert("Oops...", "ERROR", "ERROR");
+                },
+            });
+        } else {
+            swal(
+                "Dibatalkan !!",
+                "File Tidak di Delete ",
+                "ERROR"
+            );
+        }
     });
 }

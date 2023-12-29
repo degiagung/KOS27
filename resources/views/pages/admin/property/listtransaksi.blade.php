@@ -40,6 +40,7 @@
                                         <th>Masa Kos</th>
                                         <th>Tanggal Transaksi</th>
                                         <th>Nota</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
