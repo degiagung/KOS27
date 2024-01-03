@@ -114,17 +114,17 @@ function getListData() {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 },
             },
-            { data: "no_kamar",sClass:"td100",
+            { data: "no_kamar",sClass:"",
                 render: function (data, type, row, meta) {
                     return 'Kamar '+row.no_kamar;
                 }, 
             },
-            { data: "lantai",sClass:"td100",
+            { data: "lantai",sClass:"",
                 render: function (data, type, row, meta) {
                     return 'Lantai '+row.lantai;
                 },
             },
-            {sClass:"td100",
+            {sClass:"",
                 render: function (data, type, row, meta) {
                 if(row.faskosp){
                     return row.faskos+','+row.faskosp;
@@ -133,7 +133,7 @@ function getListData() {
                 }
                 }, 
             },
-            { data: "status_kamar",sClass:"td100",
+            { data: "status_kamar",sClass:"",
                 mRender: function (data, type, row) {
                     if(row.status_kamar == 'Kosong'){
                         return `<a style="color:green;font-weight:bold;">`+row.status_kamar+`</a>`;

@@ -435,6 +435,10 @@
         .masakos{
                 text-wrap: nowrap;
         }
+
+        .table {
+            white-space: nowrap !important;
+        }
     </style>
     @if ($role == 'superadmin')
         @include('pages.dashboard.dashboardadmin');
