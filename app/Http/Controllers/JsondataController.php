@@ -1476,6 +1476,7 @@ class JsonDataController extends Controller
                                 [
                                     'name' => $data->name,
                                     'email'=> $data->email,
+                                    'handphone'=> $data->handphone,
                                     'role_id' => $data->role_id,
                                     'password' => Hash::make($data->password),
                                     'is_active' => $data->is_active,
@@ -1491,6 +1492,7 @@ class JsonDataController extends Controller
                                 [
                                     'name' => $data->name,
                                     'email'=> $data->email,
+                                    'handphone'=> $data->handphone,
                                     'role_id' => $data->role_id,
                                     'is_active' => $data->is_active,
                                 ] // Kolom yang akan diisi

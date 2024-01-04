@@ -97,6 +97,7 @@ function editdata(rowData) {
     $("#form-email").val(rowData.email);
     $("#form-password").val();
     $("#form-name").val(rowData.name);
+    $("#form-handphone").val(rowData.handphone);
     $("#form-role").val(rowData.role_id).trigger("change");
 
     let $el = $("input:radio[name=form-status]");
@@ -114,6 +115,7 @@ $("#add-btn").on("click", function (e) {
     $("#form-email").val("");
     $("#form-password").val("");
     $("#form-name").val("");
+    $("#form-handphone").val("");
     $("#form-role").val("").trigger("change");
     $("input:radio[name=form-status]").prop("checked", false);
     $("#modal-data").modal("show");
@@ -139,6 +141,13 @@ function checkValidation() {
         validationSwalFailed(
             (isObject["email"] = $("#form-email").val()),
             "Email field cannot be empty."
+        )
+    )
+        return false;
+    if (
+        validationSwalFailed(
+            (isObject["handphone"] = $("#form-handphone").val()),
+            "Handphone field cannot be empty."
         )
     )
         return false;
@@ -232,13 +241,14 @@ function saveData() {
                 text: "Please wait...",
             });
         },
-        complete: function () {},
+        complete: function () {
+            $('#table-list').DataTable().ajax.reload();
+        },
         success: function (response) {
             // Handle response sukses
             if (response.code == 0) {
-                swal("Saved !", response.message, "success").then(function () {
-                    location.reload();
-                });
+                swal("Saved !", response.message, "success");
+                $("#modal-data").modal('hide');
                 // Reset form
             } else {
                 sweetAlert("Oops...", response.message, "ERROR");

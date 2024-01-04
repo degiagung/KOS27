@@ -120,7 +120,7 @@
         </div>
     </div>
 
-    <div class="video section">
+    {{-- <div class="video section">
         <div class="container">
             <div class="row">
             <div class="col-lg-4 offset-lg-4">
@@ -144,7 +144,7 @@
             </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="fun-facts">
         <div class="container">
