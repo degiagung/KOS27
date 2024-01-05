@@ -161,18 +161,12 @@ function getListData() {
             },
             { data: "name" },
             { mRender: function (data, type, row) {
-                return getMonthDifference(
-                    new Date(row.tgl_awal), new Date(row.tgl_akhir)
-                    ) + ' Bulan';
+                return row.periode + ' Bulan';
                 }
             },
             { mRender: function (data, type, row) {
-                rp = row.biaya * getMonthDifference(
-                     new Date(row.tgl_awal), new Date(row.tgl_akhir)
-                     ) ;
-                return 'Rp. '+formatRupiah(String(rp)) ;
-                    }
-            },
+                return formatRupiah(row.biaya) ;
+            }},
             { mRender: function (data, type, row) {
                 if(row.status_transaksi == null)
                     return `<a style="cursor:pointer;color:#fff;background: red;" class="showbilln" > Belum Bayar</a>`
@@ -277,6 +271,7 @@ function showbill(params) {
                             <div class="row">
                                 <div class="col-sm-3" style="padding-top:10px">
                                     <b class="bold">Rp. `+formatRupiah(params.totaltransaksi)+`</b><br>
+                                    <b class="bold">INVOICE : `+params.invoice+`</b><br>
                                     Lunas Transfer BBCA
                                 </div>
                                 <div class="col-sm-5" style="border: 3px solid black;font-size:12px;text-align:center;"><b class="bold">
@@ -359,6 +354,7 @@ function savebukti() {
     formData.append('faskos',dataedit.faskos);
     formData.append('faskosp',dataedit.faskosp);
     formData.append('tgl_awal',dataedit.tgl_awal);
+    formData.append('tgl_akhir',dataedit.tgl_akhir);
     formData.append('tipe_kamar',dataedit.tipe);
     formData.append('harga',dataedit.harga);
     formData.append('biayatambah',dataedit.biayatambah);

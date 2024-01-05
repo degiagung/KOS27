@@ -1,45 +1,7 @@
-
-$.extend($.fn.dataTable.defaults, {
-    autoWidth: false,
-    columnDefs: [
-      {
-        orderable: false,
-        width: "100px",
-        targets: [5],
-      },
-    ],
-    dom: '<"datatable-header"fBl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-    language: {
-        search      : '_INPUT_',
-        lengthMenu  : '_MENU_',
-        paginate    : { 'first': 'First', 'last': 'Last', 'next': '&rarr;', 'previous': '&larr;' }
-    },
-    buttons: [
-        { 
-            className: 'btnreload',
-            text: '<i class="icon-reload-alt" ></li>',
-            action: function ( e, dt, node, config ) {     
-                getListData();
-            }
-        },
-    ],
-    drawCallback: function () {
-      $(this)
-        .find("tbody tr")
-        .slice(-3)
-        .find(".dropdown, .btn-group")
-        .addClass("dropup");
-    },
-    preDrawCallback: function () {
-      $(this)
-        .find("tbody tr")
-        .slice(-3)
-        .find(".dropdown, .btn-group")
-        .removeClass("dropup");
-    },
+let dtpr ;
+$(document).ready(function () {
+    $('.select2').select2();
 });
-
-$('.select2').select2();
 
 $("#filter-btn").on('click',function(e){
     	
@@ -86,7 +48,7 @@ function getListData() {
 
             { 
                 className: 'btnreload',
-                text: '<i class="bi bi-arrow-clockwise" ></li>',
+                text: '<i class="bi bi-arrow-clockwise" ></i>',
                 action: function ( e, dt, node, config ) {     
                     $('#table-list').DataTable().ajax.reload();
                 }
@@ -101,6 +63,7 @@ function getListData() {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 },
             },
+            { data: "invoice" },
             { data: "name" },
             { data: "handphone" },
             { data: "no_kamar",sClass:"td100",
@@ -222,6 +185,7 @@ function showbill(params) {
                             <div class="row">
                                 <div class="col-sm-3" style="padding-top:10px">
                                     <b class="bold">Rp. `+formatRupiah(biaya)+`</b><br>
+                                    <b class="bold">INVOICE : `+params.invoice+`</b><br>
                                     Lunas Transfer BBCA
                                 </div>
                                 <div class="col-sm-5" style="border: 3px solid black;font-size:12px;text-align:center;"><b class="bold">
@@ -292,6 +256,7 @@ function savebukti() {
     formData.append('faskos',dataedit.faskos);
     formData.append('faskosp',dataedit.faskosp);
     formData.append('tgl_awal',dataedit.tgl_awal);
+    formData.append('tgl_akhir',dataedit.tgl_akhir);
     formData.append('tgl_akhir',dataedit.tgl_akhir);
     formData.append('harga',dataedit.harga);
     formData.append('biayatambah',dataedit.biayatambah);

@@ -28,10 +28,11 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="table-list" class="datatables">
+                            <table id="table-list" class="table table-lg table-hover datatables">
                                 <thead>
                                     <tr>
                                         <th>No</th>
+                                        <th>Invoice</th>
                                         <th>Penghuni</th>
                                         <th>Handphone</th>
                                         <th>No Kamar</th>
@@ -43,8 +44,6 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                </tbody>
                             </table>
                         </div>
                     </div>

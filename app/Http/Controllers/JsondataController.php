@@ -1053,9 +1053,10 @@ class JsonDataController extends Controller
                             mk.tgl_awal,
                             mk.tgl_akhir,
                             DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) as sisa_durasi,
+                            PERIOD_DIFF(DATE_FORMAT(mk.tgl_akhir, '%Y%m') , DATE_FORMAT(mk.tgl_awal, '%Y%m')) as periode,
+                            PERIOD_DIFF(DATE_FORMAT(mk.tgl_akhir, '%Y%m') , DATE_FORMAT(mk.tgl_awal, '%Y%m')) * (coalesce(sum(fsp.biaya),0)+k.harga) as biaya,
                             tk.tipe,
                             us.handphone,
-                            sum(fsp.biaya)+k.harga as biaya,
                             sum(fsp.biaya) as biayatambah,k.harga,
                             ht.id as status_transaksi,
                             ht.created_at as tgltransaksi,
@@ -1068,7 +1069,8 @@ class JsonDataController extends Controller
                             ht.tipe tipetransaksi,
                             ht.no_kamar kamartransaksi,
                             ht.jml_bulan blntransaksi,
-                            ht.handphone hptranaksi
+                            ht.handphone hptranaksi,
+                            ht.invoice
                         ";
                         
                         $table = "
@@ -1124,7 +1126,8 @@ class JsonDataController extends Controller
                             ht.tipe,
                             ht.no_kamar,
                             ht.jml_bulan,
-                            ht.handphone
+                            ht.handphone,
+                            ht.invoice
                             ORDER BY mk.tgl_akhir asc
                         ";
 
@@ -1905,22 +1908,24 @@ class JsonDataController extends Controller
                                 }
                             }
 
-                            //save mapping fasilitas penghuni
-                            $fasilitas = explode(",",$fasilitaspenghuni) ;
-                            foreach ($fasilitas as $value) {
-                                $attrmappingfas     = [
-                                    'id_kamar'      => $id,
-                                    'id_fasilitas'  => $value,
-                                    'created_at'    => $now,
-                                ];
-                                $savedmappingfas      = $MasterClass->saveGlobal('mapping_fasilitas', $attrmappingfas );
-                                if($savedmappingfas['code'] != $MasterClass::CODE_SUCCESS){
-                                    DB::rollBack();
-                                    $results = [
-                                        'code' => '1',
-                                        'info'  => "Gagal update data kamar",
+                            if($fasilitaspenghuni){
+                                //save mapping fasilitas penghuni
+                                $fasilitas = explode(",",$fasilitaspenghuni) ;
+                                foreach ($fasilitas as $value) {
+                                    $attrmappingfas     = [
+                                        'id_kamar'      => $id,
+                                        'id_fasilitas'  => $value,
+                                        'created_at'    => $now,
                                     ];
-                                    return $MasterClass->Results($results);
+                                    $savedmappingfas      = $MasterClass->saveGlobal('mapping_fasilitas', $attrmappingfas );
+                                    if($savedmappingfas['code'] != $MasterClass::CODE_SUCCESS){
+                                        DB::rollBack();
+                                        $results = [
+                                            'code' => '1',
+                                            'info'  => "Gagal update data kamar",
+                                        ];
+                                        return $MasterClass->Results($results);
+                                    }
                                 }
                             }
 
@@ -2307,11 +2312,14 @@ class JsonDataController extends Controller
                         $faskos             = $request->faskos;
                         $faskosp            = $request->faskosp;
                         $tgl_awal           = $request->tgl_awal;
+                        $tgl_awal_old       = $request->tgl_awal;
+                        $tgl_akhir_old      = $request->tgl_akhir;
                         $jmlbulan           = $request->jmlbulan;
                         $harga              = $request->harga;
                         $biayatambah        = $request->biayatambah;
                         $biaya              = $request->biaya;
                         $jenispembayaran    = $request->jenispembayaran;
+                        $invoice            = date('YmdHis').'-'.$no_kamar.'-'.$user_id ;
                         if($jenispembayaran == '1'){
                             $jmlbulan           = 1 ;
                             $tgl_akhir          = date("Y-m-d", strtotime("+1 month", strtotime($tgl_awal)));
@@ -2339,6 +2347,7 @@ class JsonDataController extends Controller
 
                             $attrphoto     = [
                                 'user_id'   => $user_id,
+                                'invoice'   => $invoice,
                                 'tgl_awal'  => $tgl_awal,
                                 'tgl_akhir' => $tgl_akhir,
                                 'file'      => $nama_file_upload,
@@ -2360,6 +2369,7 @@ class JsonDataController extends Controller
 
                             
                             $attrtransaksi     = [
+                                'invoice'           => $invoice,
                                 'user_id'           => $user_id,
                                 'name'              => $name,
                                 'handphone'         => $handphone,
@@ -2369,6 +2379,8 @@ class JsonDataController extends Controller
                                 'fasilitas_penghuni'=> $faskosp,
                                 'tgl_awal'          => $tgl_awal,
                                 'tgl_akhir'         => $tgl_akhir,
+                                'tgl_awal_old'      => $tgl_awal_old,
+                                'tgl_akhir_old'     => $tgl_akhir_old,
                                 'jml_bulan'         => $jmlbulan,
                                 'biaya_kamar'       => $harga,
                                 'biaya_tambahan'    => $biayatambah,
@@ -2598,18 +2610,26 @@ class JsonDataController extends Controller
 
                         DB::beginTransaction();     
 
-                        $data = json_decode($request->getContent());
+                        $data               = json_decode($request->getContent());                        
+                        $status             = [];
                         
-                        $status = [];
-
+                        $gettransaksi       = $MasterClass->selectGlobal('a.*,b.id as idkamar','history_transaksi a join kamar b on a.no_kamar = b.no_kamar','a.id = '.$data->id);
+                        $attrmapping        = [
+                            'tgl_awal'      => $gettransaksi['data'][0]->tgl_awal_old,
+                            'tgl_akhir'     => $gettransaksi['data'][0]->tgl_akhir_old,
+                        ];
+                        $where = [
+                            'user_id'       => $gettransaksi['data'][0]->user_id,
+                            'id_kamar'      => $gettransaksi['data'][0]->idkamar,
+                        ];
+                        $updatemapping      = $MasterClass->updateGlobal('mapping_kamar', $attrmapping,$where );
                         $where     = [
                                 'id' => $data->id
                         ];
                         $saved      = $MasterClass->deleteGlobal('history_transaksi', $where );
-                        
                         $status = $saved;
     
-                        if($status['code'] == $MasterClass::CODE_SUCCESS){
+                        if($status['code'] == $MasterClass::CODE_SUCCESS && $updatemapping['code'] == $MasterClass::CODE_SUCCESS){
                             DB::commit();
                         }else{
                             DB::rollBack();

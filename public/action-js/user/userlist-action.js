@@ -39,7 +39,7 @@ function getListData() {
             
             { 
                 className: 'btnreload',
-                text: '<i class="bi bi-arrow-clockwise" ></li>',
+                text: '<i class="bi bi-arrow-clockwise" ></i>',
                 action: function ( e, dt, node, config ) {     
                     $('#table-list').DataTable().ajax.reload();
                 }

@@ -40,7 +40,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="table-list" class="datatables">
+                            <table id="table-list" class="table table-lg table-hover datatables">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -49,7 +49,7 @@
                                         <th>Fasilitas</th>
                                         <th>Status</th>
                                         <th>Masa Kos</th>
-                                        <th>Durasi</th>
+                                        <th>Durasi Bayar</th>
                                         <th>Penghuni</th>
                                         <th>Tagihan (Bulan)</th>
                                         <th>Tagihan (Rp)</th>
