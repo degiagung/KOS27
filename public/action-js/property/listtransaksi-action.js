@@ -257,7 +257,6 @@ function savebukti() {
     formData.append('faskosp',dataedit.faskosp);
     formData.append('tgl_awal',dataedit.tgl_awal);
     formData.append('tgl_akhir',dataedit.tgl_akhir);
-    formData.append('tgl_akhir',dataedit.tgl_akhir);
     formData.append('harga',dataedit.harga);
     formData.append('biayatambah',dataedit.biayatambah);
     formData.append('biaya',dataedit.biaya * getMonthDifference(
