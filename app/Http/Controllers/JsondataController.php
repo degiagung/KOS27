@@ -1454,6 +1454,60 @@ class JsonDataController extends Controller
             return $MasterClass->Results($results);
 
         }
+        public function getdataprofile(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+                        
+                        DB::beginTransaction();
+                
+                        $status = [];
+    
+                        $saved = DB::select("SELECT * FROM users where id = ".$MasterClass->getSession('user_id'));
+                        $saved = $MasterClass->checkErrorModel($saved);
+                        
+                        $status = $saved;
+            
+                        $results = [
+                            'code' => $status['code'],
+                            'info'  => $status['info'],
+                            'data'  =>  $status['data'],
+                        ];
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
     //CRUD FUNCTION
         public function saveUser(Request $request){
 
@@ -2669,4 +2723,106 @@ class JsonDataController extends Controller
             return $MasterClass->Results($results);
 
         }
+        public function editprofile(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $nama               = $request->nama;
+                        $handphone          = $request->handphone;
+                        $now                = date('Y-m-d H:i:s');
+                        $docname            = 'profile';
+                        
+                        if(!empty($_FILES['form-file']['name'])){
+
+                            $nama_file          = $_FILES['form-file']['name'];
+                            $type		        = $_FILES['form-file']['type'];
+                            $ukuran		        = $_FILES['form-file']['size'];
+                            $tmp_name		    = $_FILES['form-file']['tmp_name'];
+                            $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
+                            $alamatfile         = '../public/data/profile/'; // directory file
+                            $filenya         = '/data/profile/'.$nama_file_upload; // directory file
+                            $uploaddir          = $alamatfile.$nama_file_upload; // directory file
+
+                            if (move_uploaded_file($tmp_name,$uploaddir)){
+                                chmod($uploaddir, 0777);
+                            }else{
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Gagal update profile",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+
+                            $attr     = [
+                                'name'          => $nama,
+                                'handphone'     => $handphone,
+                                'profile'       => $filenya,
+                                'updated_at'    => $now,
+                            ];
+                        }else{
+                            $attr     = [
+                                'name'          => $nama,
+                                'handphone'     => $handphone,
+                                'updated_at'    => $now,
+                            ];
+                        }
+
+                        $where = [
+                            'id'      => $MasterClass->getSession('user_id'),
+                        ];
+                        $updated      = $MasterClass->updateGlobal('users', $attr,$where );
+                        if($updated['code'] != $MasterClass::CODE_SUCCESS){
+                            DB::rollBack();
+                            $results = [
+                                'code' => '1',
+                                'info'  => "Gagal update profile",
+                            ];
+                            return $MasterClass->Results($results);
+                        }
+                            
+
+                        DB::commit();
+                        $results = [
+                            'code'  => $MasterClass::CODE_SUCCESS,
+                            'info'  => 'ok',
+                        ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+
 }

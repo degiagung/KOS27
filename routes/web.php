@@ -43,8 +43,11 @@ Route::get('/contact', function () {
 Route::middleware(['auth'])->group(function () { // harus login terlebih dahulu
     Route::get('/details/{id}', [GeneralController::class, 'details'])->name('details/{id}');
     Route::get('/booking', [GeneralController::class, 'booking'])->name('booking');
+    Route::get('/myprofile', [GeneralController::class, 'myprofile'])->name('myprofile');
     Route::post('/saveBooking', [JsonDataController::class, 'saveBooking'])->name('saveBooking');
     Route::post('/cekdatakamar', [JsonDataController::class, 'cekdatakamar'])->name('cekdatakamar');
+    Route::post('/getdataprofile', [JsonDataController::class, 'getdataprofile'])->name('getdataprofile');
+    Route::post('/editprofile', [JsonDataController::class, 'editprofile'])->name('editprofile');
 
     Route::middleware(['role:Superadmin'])->group(function () {
         Route::post('/generate', [GenerateController::class, 'generate'])->name('generate');

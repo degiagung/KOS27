@@ -5,7 +5,7 @@
     @endforeach
 @endpush
 @section('content')
-
+    
     <section class="section dashboard">
         <div class="row">
             <h2>List Kamar</h2>

@@ -454,6 +454,45 @@ class GeneralController extends Controller
             ->with($data);
         
     }
+    public function myprofile(Request $request){
+        $MasterClass = new Master();
+
+        $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+
+        if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+            $javascriptFiles = [
+                asset('action-js/global/global-action.js'),
+                asset('action-js/user/myprofile-action.js'),
+            ];
+        
+            $cssFiles = [
+                // asset('css/main.css'),
+                // asset('css/custom.css'),
+            ];
+            $baseURL = url('/');
+            $varJs = [
+                'const baseURL = "' . $baseURL . '"',
+                'const userid = "' . $MasterClass->getSession('user_id') . '"',
+                'const role = "' . $MasterClass->getSession('role_name') . '"',
+                'const name = "' . $MasterClass->getSession('name') . '"',
+            ];
+    
+            $data = [
+                'javascriptFiles' => $javascriptFiles,
+                'cssFiles' => $cssFiles,
+                'varJs'=> $varJs,
+                'role' => $MasterClass->getSession('role_name'),
+                'name' => $MasterClass->getSession('name'),
+                 // Menambahkan base URL ke dalam array
+            ];
+        
+            return view('pages.admin.users.myprofile')
+                ->with($data);
+        }else{
+            return redirect('/login');
+        }
+        
+    }
     
 }
 

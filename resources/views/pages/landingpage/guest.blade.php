@@ -99,7 +99,7 @@
                 <ul>
                     <li>
                     <img src="../ref_layouts/landingpage/assets/images/info-icon-01.png" alt="" style="max-width: 52px;">
-                    <h4>125 Kamar<br><span>Total Kamar Keseluruhan</span></h4>
+                    <h4>30 Kamar<br><span>Total Kamar Keseluruhan</span></h4>
                     </li>
                     <li>
                     <img src="../ref_layouts/landingpage/assets/images/info-icon-02.png" alt="" style="max-width: 52px;">
@@ -154,7 +154,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                     <div class="counter">
-                        <h2 class="timer count-title count-number" data-to="34" data-speed="1000"></h2>
+                        <h2 class="timer count-title count-number" data-to="2" data-speed="1000"></h2>
                         <p class="count-text ">Bangunan<br>Baru</p>
                     </div>
                     </div>
@@ -166,7 +166,7 @@
                     </div>
                     <div class="col-lg-4">
                     <div class="counter">
-                        <h2 class="timer count-title count-number" data-to="125 " data-speed="1000"></h2>
+                        <h2 class="timer count-title count-number" data-to="30 " data-speed="1000"></h2>
                         <p class="count-text ">Penghuni<br>Kos</p>
                     </div>
                     </div>
