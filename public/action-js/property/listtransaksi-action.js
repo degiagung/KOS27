@@ -53,8 +53,8 @@ function getListData() {
                     $('#table-list').DataTable().ajax.reload();
                 }
             },
-            { text: ' ', extend: 'pdfHtml5',  className: 'btndownload iconpdf',  title:'List kamar', exportOptions: {columns:[':not(.notdown)']}},
-            { text: ' ', extend: 'excel',  className: 'btndownload iconexcel',  title:'List kamar', exportOptions: {columns:[':not(.notdown)']}},
+            { text: ' ', extend: 'pdfHtml5',  className: 'btndownload iconpdf',  title:'List Transaksi', exportOptions: {columns:[':not(.notdown)']}},
+            { text: ' ', extend: 'excel',  className: 'btndownload iconexcel',  title:'List Transaksi', exportOptions: {columns:[':not(.notdown)']}},
         ],
         columns: [
             {

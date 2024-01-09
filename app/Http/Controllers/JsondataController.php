@@ -2374,6 +2374,9 @@ class JsonDataController extends Controller
                         $biaya              = $request->biaya;
                         $jenispembayaran    = $request->jenispembayaran;
                         $invoice            = date('YmdHis').'-'.$no_kamar.'-'.$user_id ;
+                        if($biayatambah == 'null'){
+                            $biayatambah = 0.00;
+                        }
                         if($jenispembayaran == '1'){
                             $jmlbulan           = 1 ;
                             $tgl_akhir          = date("Y-m-d", strtotime("+1 month", strtotime($tgl_awal)));
