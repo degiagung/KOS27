@@ -29,7 +29,7 @@
                 <div class="tab-pane fade show active" id="appartment" role="tabpanel" aria-labelledby="appartment-tab">
                   <div class="row">
                     <div class="icon-button">
-                      <a onclick="modalbooking()" style="color:#fff;"><i class="fa fa-calendar"></i> BOOKING</a>
+                      <a onclick="modalbooking()" style="color:#fff;"><i class="fa fa-calendar"></i>PRE BOOKING</a>
                     </div>
                     <div class="col-lg-5" style="margin-top: 15px;">
                       <div class="info-table">
@@ -68,10 +68,10 @@
         <div class="modal-body">
             <center>
 
-                <div class="mb-3 row">
+                <div class="mb-3 row" style="display: none;">
                     <label class="col-sm-3 col-form-label">Tanggal Kos</label>
                     <div class="col-sm-9">
-                        <input id="form-tgl" name="form-tgl" type="date" class="form-control" min="{{ now()->toDateString('Y-m-d') }}">
+                        <input id="form-tgl" name="form-tgl" type="date" class="form-control" value="{{ now()->toDateString('Y-m-d') }}" min="{{ now()->toDateString('Y-m-d') }}">
                     </div>
                 </div>
                 <div class="mb-3 row">

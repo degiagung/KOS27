@@ -209,6 +209,34 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal"id="modal-approval">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header heademodal">
+                    <h5 class="modal-title">Approve Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Tanggal Kos</label>
+                        <div class="col-sm-9">
+                            <input id="form-tglkos" type="date" class="form-control" value="{{ now()->toDateString('Y-m-d') }}" min="{{ now()->toDateString('Y-m-d') }}">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Jml Bulan Pre Booking</label>
+                        <div class="col-sm-9">
+                            <input id="form-booking" type="number" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onClick="editbooking()" class="btn btn-primary">Setujui</button>
+                </div>
+                </div>
+            </div>
+        </div>
         
     </section>
 @endsection

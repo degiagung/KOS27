@@ -62,9 +62,9 @@ function listkamar(){
                     <a href="`+baseURL+`/details/`+id+`" }}"><img src="`+file+`" style="width:300px !important;height:300px !important; " alt=""></a>
                     <span class="category" style="font-size:13px">`+tipe+`</span>
                     <h6 style="font-size:13px">Rp . `+formatRupiah(harga)+` / BLN</h6>
-                    <h4 style="font-size:18px;">Dilengkapi Fasilitas `+fas+`</h4>
+                    <h4 style="font-size:15px;">Lantai `+lantai+` No `+no_kamar+` <br>Dilengkapi Fasilitas `+fas+`</h4>
                     <div class="main-button">
-                        <a href="`+baseURL+`/details/`+id+`">Booking</a>
+                        <a href="`+baseURL+`/details/`+id+`">Pre Booking</a>
                     </div>
                     </div>
                 </div>

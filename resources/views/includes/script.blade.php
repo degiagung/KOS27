@@ -1,3 +1,5 @@
+<meta name="_token" content="{{ csrf_token() }}">
+
 <!-- Required vendors -->
 <script src="{{ asset('template/admin/vendor/global/global.min.js') }}"></script>
 <script src="{{ asset('template/admin/vendor/chart.js/Chart.bundle.min.js') }}"></script>
@@ -68,3 +70,27 @@
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script>
+
+    notifikasi();
+    let counter = 0 ;
+    setInterval(() => {
+        jml = counter++ 
+        if(jml == 50000){
+            counter = 0 ;
+            notifikasi();
+        }
+    }, 1000);
+    function notifikasi(){
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            headers: {
+                'X-CSRF-Token': $('meta[name="_token"]').attr('content')
+            },  
+            url: window.location.origin + '/updatekamar7hari',
+            
+        });
+                
+    }
+</script>

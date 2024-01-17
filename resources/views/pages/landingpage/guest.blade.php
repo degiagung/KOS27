@@ -29,7 +29,7 @@
             <div class="row">
             <div class="col-lg-4">
                 <div class="left-image">
-                <img src="../ref_layouts/landingpage/assets/images/featured.jpg" alt="">
+                <img src="../ref_layouts/landingpage/assets/images/banner-03.jpg" alt="">
                 {{-- <a href="property-details.html"><img src="../ref_layouts/landingpage/assets/images/featured-icon.png" alt="" style="max-width: 60px; padding: 0px;"></a> --}}
                 </div>
             </div>

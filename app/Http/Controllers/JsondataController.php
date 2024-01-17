@@ -605,6 +605,7 @@ class JsonDataController extends Controller
                             CONVERT(mk.tgl_awal,date) tgl_awal,
                             CONVERT(mk.tgl_akhir,date) tgl_akhir,
                             DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) as sisa_durasi,
+                            mk.jml_bulan_booking as jmlbooking ,
                             count(fsper.fasilitas) countperbaikan
                         ";
                         
@@ -654,6 +655,7 @@ class JsonDataController extends Controller
                             mk.tgl_awal,
                             mk.tgl_akhir,
                             mk.user_id,
+                            mk.jml_bulan_booking,
                             tk.tipe
                             ORDER BY k.no_kamar asc
                         ";
@@ -1085,7 +1087,7 @@ class JsonDataController extends Controller
                                 AND ht.tgl_akhir = mk.tgl_akhir
                         ";
                         $where = " 
-                            mk.user_id is not null
+                            mk.user_id is not null and mk.tgl_awal is not null
                         ";
                         $sisawaktu = $request->sisawaktu ;
                         $statusbayar = $request->status ;
@@ -2542,10 +2544,11 @@ class JsonDataController extends Controller
                         }
                         $now                = date('Y-m-d H:i:s');
                         $attrmapping     = [
-                            'user_id'       => $penghuni,
-                            'id_tipe'       => $tipekamar,
-                            'tgl_awal'      => $tglawal,
-                            'tgl_akhir'     => $tglakhir,
+                            'user_id'           => $penghuni,
+                            'id_tipe'           => $tipekamar,
+                            'jml_bulan_booking' => $jmlbulan,
+                            // 'tgl_awal'      => $tglawsal,
+                            // 'tgl_akhir'     => $tglakhir,
                             'updated_at'    => $now,
                         ];
                         $where     = [
@@ -2608,11 +2611,12 @@ class JsonDataController extends Controller
                         DB::beginTransaction();     
 
                         $data = json_decode($request->getContent());
-                        $status = [];
                         
-                        $saved      = DB::update("UPDATE users us set role_id = (select id from users_roles where role_name='penghuni') where id= $data->id ");
-                        $status     = $saved;
-                        if($status == 1){
+                        $tglawal    = date("Y-m-d",strtotime($data->tgl)) ;
+                        $tglakhir   = date("Y-m-d", strtotime("+".$data->bln." month", strtotime($tglawal))) ;
+                        $mapkam     = DB::update("UPDATE mapping_kamar set tgl_awal = '$tglawal' ,tgl_akhir = '$tglakhir'  where user_id= $data->id ");
+                        $users      = DB::update("UPDATE users us set role_id = (select id from users_roles where role_name='penghuni') where id= $data->id ");
+                        if($mapkam == 1 && $users == 1){
                             DB::commit();
                             
                             $results = [
@@ -2796,6 +2800,52 @@ class JsonDataController extends Controller
                         DB::commit();
                         $results = [
                             'code'  => $MasterClass::CODE_SUCCESS,
+                            'info'  => 'ok',
+                        ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function updatekamar7hari(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $users      = DB::update("DELETE FROM mapping_kamar mk WHERE DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE)  < -7");
+                        $results = [
+                            'code' => '0',
                             'info'  => 'ok',
                         ];
             

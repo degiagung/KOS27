@@ -192,7 +192,9 @@ function editdata(rowData) {
     isObject = rowData;
     isObject['tipe'] = 'update';
     if(rowData.status_kamar == 'Booking'){
-        editbooking(rowData);
+        $("#modal-approval").modal('show');
+        $("#form-booking").val('');
+        $("#form-booking").val(rowData.jmlbooking);
     }else{
 
         fotokamar(rowData.id)
@@ -242,7 +244,17 @@ function editdata(rowData) {
 }
 
 function editbooking(data) {
-  
+    tgl = $("#form-tglkos").val() ;
+    bln = $("#form-booking").val() ;
+    if(tgl == ''){
+        swalwarning('Tanggal Kos harus diisi');
+        return false ;
+    };
+    if(bln == ''){
+        swalwarning('Jml bulan harus diisi');
+        return false ;
+    };
+
     swal({
         title: "Apakah Yakin Untuk Menyetujui ?",
         type: "warning",
@@ -257,7 +269,7 @@ function editbooking(data) {
             $.ajax({
                 url: baseURL + "/setujuibooking",
                 type: "POST",
-                data: JSON.stringify({ id: data.user_id }),
+                data: JSON.stringify({ id: isObject['user_id'] , tgl:tgl, bln:bln}),
                 dataType: "json",
                 contentType: "application/json",
                 beforeSend: function () {
@@ -268,6 +280,8 @@ function editbooking(data) {
                 },
                 complete: function () {
                     $('#table-list').DataTable().ajax.reload();
+                    $("#modal-approval").modal('hide');
+
                 },
                 success: function (response) {
                     // Handle response sukses
