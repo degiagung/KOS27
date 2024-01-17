@@ -335,15 +335,16 @@ function editdata(p){
 function savebukti() {
     let jmlbulan    = $("#form-bln").val() ; 
     let jenispembayaran = $("#form-pembayaran").val();
+    if(jenispembayaran == '1'){
+        jmlbulan = dataedit.jml_bulan_booking ;
+    }
     if($("#form-bukti").val() == ''){
         swalwarning('Bukti tidak boleh kosong');
         return false ;
     }
-    if(jenispembayaran != '1'){
-        if(jmlbulan <= 0){
-            swalwarning('Jumlah Bulan minimal 1 bulan');
-            return false ;
-        }
+    if(jmlbulan <= 0){
+        swalwarning('Jumlah Bulan minimal 1 bulan');
+        return false ;
     }
     const formData    = new FormData(document.getElementById("formbukti"));
     formData.append('idkamar',dataedit.id);
@@ -359,7 +360,7 @@ function savebukti() {
     formData.append('harga',dataedit.harga);
     formData.append('biayatambah',dataedit.biayatambah);
     formData.append('jmlbulan',jmlbulan);
-    formData.append('biaya',dataedit.biaya * jmlbulan);
+    formData.append('biaya',(dataedit.harga * jmlbulan) + (dataedit.biayatambah * jmlbulan) );
     formData.append('jenispembayaran',jenispembayaran);
 
     $.ajax({

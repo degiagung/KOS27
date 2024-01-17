@@ -1072,7 +1072,8 @@ class JsonDataController extends Controller
                             ht.no_kamar kamartransaksi,
                             ht.jml_bulan blntransaksi,
                             ht.handphone hptranaksi,
-                            ht.invoice
+                            ht.invoice,
+                            mk.jml_bulan_booking
                         ";
                         
                         $table = "
@@ -1129,7 +1130,8 @@ class JsonDataController extends Controller
                             ht.no_kamar,
                             ht.jml_bulan,
                             ht.handphone,
-                            ht.invoice
+                            ht.invoice,
+                            mk.jml_bulan_booking
                             ORDER BY mk.tgl_akhir asc
                         ";
 
@@ -2380,8 +2382,7 @@ class JsonDataController extends Controller
                             $biayatambah = 0.00;
                         }
                         if($jenispembayaran == '1'){
-                            $jmlbulan           = 1 ;
-                            $tgl_akhir          = date("Y-m-d", strtotime("+1 month", strtotime($tgl_awal)));
+                            $tgl_akhir          = $tgl_akhir_old;
                         }else{
                             $tgl_awal           = date("Y-m-d", strtotime("+".$jmlbulan." month", strtotime($tgl_awal)));
                             $tgl_akhir          = date("Y-m-d", strtotime("+".$jmlbulan." month", strtotime($tgl_awal)));
@@ -2614,7 +2615,7 @@ class JsonDataController extends Controller
                         
                         $tglawal    = date("Y-m-d",strtotime($data->tgl)) ;
                         $tglakhir   = date("Y-m-d", strtotime("+".$data->bln." month", strtotime($tglawal))) ;
-                        $mapkam     = DB::update("UPDATE mapping_kamar set tgl_awal = '$tglawal' ,tgl_akhir = '$tglakhir'  where user_id= $data->id ");
+                        $mapkam     = DB::update("UPDATE mapping_kamar set tgl_awal = '$tglawal' ,tgl_akhir = '$tglakhir',jml_bulan_booking = $data->bln  where user_id= $data->id ");
                         $users      = DB::update("UPDATE users us set role_id = (select id from users_roles where role_name='penghuni') where id= $data->id ");
                         if($mapkam == 1 && $users == 1){
                             DB::commit();
