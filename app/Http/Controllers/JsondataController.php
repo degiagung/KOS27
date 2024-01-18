@@ -2878,5 +2878,55 @@ class JsonDataController extends Controller
             return $MasterClass->Results($results);
 
         }
+        public function cekmasakos(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+                        $userid     = $MasterClass->getSession('user_id');
+                        $select     = "
+                                        DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) as masa
+                        ";
+                        $users      = DB::select("SELECT $select  FROM mapping_kamar mk where user_id = $userid ");
+                        $results = [
+                            'code'  => '0',
+                            'info'  => 'ok',
+                            'data'  => $users
+                        ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
 
 }

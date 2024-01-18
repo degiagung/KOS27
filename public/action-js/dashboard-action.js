@@ -392,3 +392,36 @@ function savebukti() {
         },
     });
 }
+
+if(role == 'penghuni'){
+    notifikasi();
+}
+function notifikasi(){
+    $.ajax({
+        type: 'POST',
+        dataType: 'json', 
+        url: window.location.origin + '/cekmasakos',
+        success: function (response) {
+            console.log()
+            // Handle response sukses
+            masakos = response['data'][0].masa ;
+            if (masakos <= -7) {
+                $("#marque").show();
+                $("#marque").html(`
+                    <h1 style='color: #fff;'>Segera kosongkan kamar kos anda karna masa kos anda melebihi masa tenggat `+masakos* -7+` hari</h1>
+                `)
+            }else if (masakos <= -1) {
+                $("#marque").show();
+                $("#marque").html(`
+                    <h1 style='color: #fff;'>Masa kos anda melebihi masa tenggat `+masakos * -1+` hari, Segera lakukan pembayaran !!!</h1>
+                `)
+            }else if (masakos <= 3) {
+                $("#marque").show();
+                $("#marque").html(`
+                    <h1 style='color: #fff;'>Masa kos anda `+masakos+` hari lagi HABIS, Segera lakukan pembayaran !!!</h1>
+                `)
+            }
+        },
+    });
+            
+}

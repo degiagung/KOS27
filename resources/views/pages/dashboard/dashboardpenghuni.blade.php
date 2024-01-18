@@ -1,5 +1,7 @@
 <section class="section dashboard">
         <div class="row">
+            <marquee id="marque" behavior="" direction="" style="display:none;background: red">
+            </marquee><br>
             <h2>Dashboard Monitoring Kamar</h2>
             <br>
             @if (Str::lower($role) == 'penjaga' || Str::lower($role) == 'superadmin')
