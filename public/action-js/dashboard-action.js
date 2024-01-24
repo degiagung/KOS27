@@ -402,13 +402,13 @@ function notifikasi(){
         dataType: 'json', 
         url: window.location.origin + '/cekmasakos',
         success: function (response) {
-            console.log()
             // Handle response sukses
             masakos = response['data'][0].masa ;
+            console.log(masakos)
             if (masakos <= -7) {
                 $("#marque").show();
                 $("#marque").html(`
-                    <h1 style='color: #fff;'>Segera kosongkan kamar kos anda karna masa kos anda melebihi masa tenggat `+masakos* -7+` hari</h1>
+                    <h1 style='color: #fff;'>Segera kosongkan kamar kos anda karna masa kos anda melebihi masa tenggat `+masakos* -1+` hari</h1>
                 `)
             }else if (masakos <= -1) {
                 $("#marque").show();
