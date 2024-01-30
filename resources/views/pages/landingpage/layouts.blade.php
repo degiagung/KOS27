@@ -103,13 +103,9 @@ https://templatemo.com/tm-591-villa-agency
                             <select id="form-bank" style="width: 100%;">
                                 <option value="">Pilih Bank</option>
                                 <option value="1">BCA</option>
-                                <option value="1">BCA Syariah</option>
                                 <option value="1">BNI</option>
-                                <option value="1">BNI Syariah</option>
                                 <option value="1">BRI</option>
-                                <option value="1">BRI Syariah</option>
                                 <option value="1">Mandiri</option>
-                                <option value="1">Mandiri Syariah</option>
                             </select>
                         </div>
                     </div>
@@ -331,7 +327,7 @@ https://templatemo.com/tm-591-villa-agency
         function savebukti() {
             
             if($("#form-va").val() == ''){
-                swal('Opss','Silahkan Pilih metode pembayaran','warning');
+                swal('Opss','Silahkan Pilih Bank','warning');
                 return false ;
             }
             if($("#form-bayar").val() == ''){

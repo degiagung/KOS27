@@ -43,6 +43,9 @@ $('.select2').select2();
 $("#form-pembayaran").select2({
     dropdownParent: $("#modal-update"),
 });
+$("#form-bank").select2({
+    dropdownParent: $("#modal-update"),
+});
 
 $("#form-pembayaran").on('change',function(){
     if($("#form-pembayaran").val() == '1'){
@@ -349,6 +352,10 @@ function savebukti() {
     if(jenispembayaran == '1'){
         jmlbulan = dataedit.jml_bulan_booking ;
     }
+    if($("#form-va").val() == ''){
+        swal('Opss','Silahkan Pilih Bank','warning');
+        return false ;
+    }
     if($("#form-bukti").val() == ''){
         swalwarning('Bukti tidak boleh kosong');
         return false ;
@@ -489,3 +496,21 @@ function dashboardpenghuni(){
         }
     })
 }
+
+$("#form-bank").change( function (e) {
+            $("#form-va").val('');
+            if($("#form-bank").val() != ''){
+                $(".divva").show();
+                const day = new Date();
+                let y = day.getFullYear();
+                let m = day.getMonth();
+                let d = day.getDate();
+                let h = day.getHours();
+                let mt= day.getMinutes();
+                let s = day.getSeconds();
+                va = '0001'+y+''+m+''+d+''+h+''+mt+''+s;
+                $("#form-va").val(va);
+            }else{
+                $(".divva").hide();
+            }
+        })

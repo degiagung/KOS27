@@ -95,6 +95,24 @@
             <div class="modal-body">
                 <center>
                     <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Bank</label>
+                            <div class="col-sm-9">
+                                <select id="form-bank" style="width: 100%;">
+                                    <option value="">Pilih Bank</option>
+                                    <option value="1">BCA</option>
+                                    <option value="1">BNI</option>
+                                    <option value="1">BRI</option>
+                                    <option value="1">Mandiri</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3 row divva" style="display:none;">
+                            <label class="col-sm-3 col-form-label">No VA</label>
+                            <div class="col-sm-9">
+                                <input id="form-va" type="text" class="form-control" readonly>
+                            </div>
+                        </div>
+                    <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label">Bukti Transaksi</label>
                         <div class="col-sm-9">
                             <form role="form" class="" id="formbukti" method="post" type="post" enctype="multipart/form-data">

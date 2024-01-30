@@ -2097,7 +2097,14 @@ class JsonDataController extends Controller
                                     $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
                                     $alamatfile         = '../public/data/kos/'; // directory file
                                     $uploaddir          = $alamatfile.$nama_file_upload; // directory file
-                                    
+                                    if($ukuran > 2000000){
+                                        DB::rollBack();
+                                        $results = [
+                                            'code' => '1',
+                                            'info'  => "Ukuran gambar max 2 MB",
+                                        ];
+                                        return $MasterClass->Results($results);
+                                    }
                                     if (move_uploaded_file($tmp_name,$uploaddir)){
                                         chmod($uploaddir, 0777);
     
@@ -2223,7 +2230,14 @@ class JsonDataController extends Controller
                                 $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
                                 $alamatfile         = '../public/data/kos/'; // directory file
                                 $uploaddir          = $alamatfile.$nama_file_upload; // directory file
-                                
+                                if($ukuran > 2000000){
+                                    DB::rollBack();
+                                    $results = [
+                                        'code' => '1',
+                                        'info'  => "Ukuran gambar max 2 MB",
+                                    ];
+                                    return $MasterClass->Results($results);
+                                }
                                 if (move_uploaded_file($tmp_name,$uploaddir)){
                                     chmod($uploaddir, 0777);
 
@@ -2336,7 +2350,14 @@ class JsonDataController extends Controller
                             $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
                             $alamatfile         = '../public/data/kos/'; // directory file
                             $uploaddir          = $alamatfile.$nama_file_upload; // directory file
-                            
+                            if($ukuran > 2000000){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Ukuran gambar max 2 MB",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
                             if (move_uploaded_file($tmp_name,$uploaddir)){
                                 chmod($uploaddir, 0777);
     
@@ -2451,6 +2472,14 @@ class JsonDataController extends Controller
                         $type		        = $_FILES['form-bukti']['type'];
                         $ukuran		        = $_FILES['form-bukti']['size'];
                         $tmp_name		    = $_FILES['form-bukti']['tmp_name'];
+                        if($ukuran > 2000000){
+                             DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Ukuran gambar max 2 MB",
+                                ];
+                                return $MasterClass->Results($results);
+                        }
                         $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
                         $alamatfile         = '../public/data/bukti/'; // directory file
                         $uploaddir          = $alamatfile.$nama_file_upload; // directory file
@@ -2812,7 +2841,14 @@ class JsonDataController extends Controller
                             $alamatfile         = '../public/data/profile/'; // directory file
                             $filenya         = '/data/profile/'.$nama_file_upload; // directory file
                             $uploaddir          = $alamatfile.$nama_file_upload; // directory file
-
+                            if($ukuran > 2000000){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Ukuran gambar max 2 MB",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
                             if (move_uploaded_file($tmp_name,$uploaddir)){
                                 chmod($uploaddir, 0777);
                             }else{
@@ -3089,7 +3125,14 @@ class JsonDataController extends Controller
                         $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
                         $alamatfile         = '../public/data/bukti/'; // directory file
                         $uploaddir          = $alamatfile.$nama_file_upload; // directory file
-                        
+                        if($ukuran > 2000000){
+                            DB::rollBack();
+                            $results = [
+                                'code' => '1',
+                                'info'  => "Ukuran gambar max 2 MB",
+                            ];
+                            return $MasterClass->Results($results);
+                        }
                         if (move_uploaded_file($tmp_name,$uploaddir)){
                             chmod($uploaddir, 0777);
 
