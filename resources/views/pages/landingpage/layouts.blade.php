@@ -42,9 +42,101 @@ https://templatemo.com/tm-591-villa-agency
   </head>
 
 <body>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @include("pages.landingpage.header")
     @yield('content');
-    
+    <div class="modal fade" id="modal-bayar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Informasi Pembayaran</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <center>
+                    
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">No Kamar</label>
+                        <div class="col-sm-9">
+                            <input readonly id="form-kamar" type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Tipe</label>
+                        <div class="col-sm-9">
+                            <input readonly id="form-iftipe" type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Fasilitas</label>
+                        <div class="col-sm-9">
+                            <input readonly id="form-iffasilitas" type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Tgl Kos</label>
+                        <div class="col-sm-9">
+                            <input readonly id="form-iftgl" type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Periode Kos</label>
+                        <div class="col-sm-9">
+                            <input readonly id="form-ifdurasi" type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Harga Kamar</label>
+                        <div class="col-sm-9">
+                            <input readonly id="form-ifhraga" type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Total Biaya</label>
+                        <div class="col-sm-9">
+                            <input readonly id="form-ifbiaya" type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Bank</label>
+                        <div class="col-sm-9">
+                            <select id="form-bank" style="width: 100%;">
+                                <option value="">Pilih Bank</option>
+                                <option value="1">BCA</option>
+                                <option value="1">BCA Syariah</option>
+                                <option value="1">BNI</option>
+                                <option value="1">BNI Syariah</option>
+                                <option value="1">BRI</option>
+                                <option value="1">BRI Syariah</option>
+                                <option value="1">Mandiri</option>
+                                <option value="1">Mandiri Syariah</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row divva" style="display:none;">
+                        <label class="col-sm-3 col-form-label">No VA</label>
+                        <div class="col-sm-9">
+                            <input id="form-va" type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Bukti Transaksi (*)</label>
+                        <div class="col-sm-9">
+                            <form role="form" class="" id="formbayar" method="post" type="post" enctype="multipart/form-data">
+                                <input id="form-bayar" name="formbayar" accept="image/*" type="file" class="form-control" >
+                            </form>
+                        </div>
+                    </div>
+                </center>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="batalbooking()">Batalkan Booking</button>
+                <button type="button" class="btn btn-primary" onclick="savebukti()">Simpan</button>
+            </div>
+            </div>
+        </div>
+    </div>
     @include('pages.landingpage.contact')
     <div class="col-lg-12">
         <div id="map">
@@ -65,6 +157,7 @@ https://templatemo.com/tm-591-villa-agency
     <!-- Bootstrap core JavaScript -->
     <script src="../ref_layouts/landingpage/vendor/jquery/jquery.min.js"></script>
     <script src="../ref_layouts/landingpage/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{ asset('template/admin/vendor/select2/js/select2.full.min.js') }}"></script>
     <script src="../ref_layouts/landingpage/assets/js/isotope.min.js"></script>
     <script src="../ref_layouts/landingpage/assets/js/owl-carousel.js"></script>
     <script src="../ref_layouts/landingpage/assets/js/counter.js"></script>
@@ -73,6 +166,24 @@ https://templatemo.com/tm-591-villa-agency
     <script src="{{ asset('template/admin/vendor/sweetalert2/dist/sweetalert2.min.js') }}" aria-hidden="true"></script>
 
     <script>
+        
+        $("#form-bank").change( function (e) {
+            $("#form-va").val('');
+            if($("#form-bank").val() != ''){
+                $(".divva").show();
+                const day = new Date();
+                let y = day.getFullYear();
+                let m = day.getMonth();
+                let d = day.getDate();
+                let h = day.getHours();
+                let mt= day.getMinutes();
+                let s = day.getSeconds();
+                va = '0001'+y+''+m+''+d+''+h+''+mt+''+s;
+                $("#form-va").val(va);
+            }else{
+                $(".divva").hide();
+            }
+        })
         showmpas()
         function showmpas(){
             var mbAttr = 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
@@ -114,6 +225,166 @@ https://templatemo.com/tm-591-villa-agency
 
             L.marker(latlng,{icon : myIcon}).addTo(map)
         } 
+        var va = '';
+        showpembayaran('');
+        function showpembayaran(p) {
+            
+            
+            $.ajax({
+                url: window.location.origin + "/getva",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                beforeSend: function () {
+                    // Swal.fire({
+                    //     title: "Loading",
+                    //     text: "Please wait...",
+                    //     showConfirmButton: false, // Menyembunyikan tombol OK
+                    // });
+                },
+                complete: function (response) {
+                    
+                },
+                success: function (response) {
+                    
+                    if (response.data.length >=1) {
+                        if(response.data[0].role_name == 'guest' && response.data[0].id){
+                            $("#form-kamar").val(response.data[0].no_kamar);
+                            $("#form-iftipe").val(response.data[0].tipe_kamar);
+                            $("#form-iffasilitas").val(response.data[0].faskos);
+                            $("#form-iftgl").val(response.data[0].tgl_awal);
+                            $("#form-ifdurasi").val(response.data[0].jmlbulan);
+                            $("#form-ifhraga").val(response.data[0].harga);
+                            $("#form-ifbiaya").val(response.data[0].harga * response.data[0].jmlbulan);
+
+                            swal("Oopss", 'Anda sudah booking kamar sebelumnya , silahkan lakukan pembayaran atau batalkan pembayaran terlebih dahulu', "warning")
+                            .then(function (e){
+                                if(p){
+                                    if(p == 'booking'){
+                                        $("#modal-bayar").modal('show');
+                                    }else{
+                                        $("#modal-booking").modal('show');
+                                    }
+                                }else{
+                                    $("#modal-bayar").modal('show');
+                                }
+                            });
+                        }else{
+                            if(p){
+                                $("#modal-booking").modal('show');
+                            }
+                        }
+                    }
+                    
+                }
+            })
+        }
+        function batalbooking(){
+            swal({
+                title: "Apakah Yakin Untuk Membatalkan Booking ?",
+                type: "warning",
+                showCancelButton: !0,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yakin",
+                cancelButtonText: "Kembali",
+                closeOnConfirm: !1,
+                closeOnCancel: !1,
+            }).then(function (e) {
+                if (e.value) {
+                    $.ajax({
+                        url: baseURL + "/batalbooking",
+                        type: "POST",
+                        dataType: "json",
+                        contentType: "application/json",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                            },
+                        complete: function () {
+                        },
+                        success: function (response) {
+                            // Handle response sukses
+                            if (response.code == 0) {
+                                swal("Berhasil !", 'Booking telah dibatalkan', "success")
+                                .then(function (e){
+                                    location.reload() ;
+                                });
+                            } else {
+                                sweetAlert("Oops...", response.message, "ERROR");
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            sweetAlert("Oops...", "ERROR", "ERROR");
+                        },
+                    });
+                } else {
+                    swal(
+                        "Batal",
+                        "Data tidak berubah",
+                        "ERROR"
+                    );
+                }
+            });
+        }
+        function savebukti() {
+            
+            if($("#form-va").val() == ''){
+                swal('Opss','Silahkan Pilih metode pembayaran','warning');
+                return false ;
+            }
+            if($("#form-bayar").val() == ''){
+                swal('Opss','Bukti tidak boleh kosong','warning');
+                return false ;
+            }
+            const formData    = new FormData(document.getElementById("formbayar"));
+            formData.append('va',va);
+
+            $.ajax({
+                url: baseURL + "/SaveVa",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                beforeSend: function () {
+                    Swal.fire({
+                        title: "Loading",
+                        text: "Please wait...",
+                    });
+                },
+                complete: function () {
+                },
+                success: function (response) {
+                    // Handle response sukses
+                    if (response.code == 0) {
+                        swal("Berhasil !", 'Pembayaran Berhasil, Silahkan login ulang untuk melihat fitur-fitur penghuni', "success").then(function () {
+                                
+                            $.ajax({
+                                url: baseURL + "/logout",
+                                type: "POST",
+                                headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                                },
+                                complete:function(){
+                                    window.location.href = window.location.origin;
+                                }
+                            });
+                        });
+                        $("#modal-bayar").modal("hide");
+
+                    } else {
+                        swal("Oops...", 'Gagal simpan', "error");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    swal("Oops...", "ERROR", "ERROR");
+                },
+            });
+        }
     </script>
     @stack('after-script')
 

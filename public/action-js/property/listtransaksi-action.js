@@ -11,7 +11,8 @@ $("#filter-btn").on('click',function(e){
 
 getListData();
 function getListData() {
-    filtersisa = $("#filter-sisa").val() ;
+    filterbln = $("#filter-bln").val() ;
+    console.log(filterbln);
     $('#table-list').dataTable().fnClearTable();
     $('#table-list').dataTable().fnDraw();
     $('#table-list').dataTable().fnDestroy();
@@ -20,7 +21,7 @@ function getListData() {
             url: baseURL + "/listTransaksi",
             type: "POST",
             data: {
-                sisawaktu   : filtersisa,
+                fbln   : filterbln,
             },
             dataType: "json",
             dataSrc: function (response) {

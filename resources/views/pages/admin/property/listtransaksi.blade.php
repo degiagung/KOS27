@@ -21,7 +21,22 @@
         <div class="row">
             <h2>List Transaksi</h2>
             <br>
-            
+            <div class="col-lg-12">
+                 <div class="card-filter">
+                    <label style="font-size:18px;">Filter</label>
+                    <hr>
+                    <div class="row">
+                        
+                        <div class="col-sm-3">
+                            <label>Periode Transaksi</label>
+                            <input type="month" id="filter-bln" class="form-control"></input>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="submit" id="filter-btn" class="btn btn-sgn" style="color:#e12a2a;width:100%;height:35px;font-size:14px;margin-top: 27px;"><i class="bi bi-search" style="font-size:12px;" ></i> Cari</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div><br>
         <div class="row">
             <div class="col-lg-12">

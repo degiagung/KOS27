@@ -64,7 +64,7 @@ function listkamar(){
                     <h6 style="font-size:13px">Rp . `+formatRupiah(harga)+` / BLN</h6>
                     <h4 style="font-size:15px;">Lantai `+lantai+` No `+no_kamar+` <br>Dilengkapi Fasilitas `+fas+`</h4>
                     <div class="main-button">
-                        <a href="`+baseURL+`/details/`+id+`">Pre Booking</a>
+                        <a href="`+baseURL+`/details/`+id+`">Booking</a>
                     </div>
                     </div>
                 </div>

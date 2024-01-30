@@ -53,9 +53,21 @@ $("#form-pembayaran").on('change',function(){
 });
 
 $("#filter-btn").on('click',function(e){
-    	
     getListData()
+})
+$("#btn-bayar").on('click',function(e){
+    if(dataedit.status_transaksi == null){
+        
+        $("#form-status").select2({
+            dropdownParent: $(".modal"),
+        });
+        $("#btn-update").removeAttr("onclick");
+        $("#btn-update").attr("onclick","savebukti()");
     
+        $("#modal-update").modal('show');
+    }else{
+        showbill(dataedit);
+    }
 })
 
 getListData();
@@ -77,8 +89,7 @@ function getListData() {
             dataSrc: function (response) {
                 if (response.code == 0) {
                     es = response.data;
-                    // console.log(es);
-
+                    
                     return response.data;
                 } else {
                     return response;
@@ -377,7 +388,11 @@ function savebukti() {
         },
         complete: function () {
             $("#modal-update").modal("hide");
-            $('#table-list').DataTable().ajax.reload();
+            if (role == 'penghuni') {
+                dashboardpenghuni();
+            }else{
+                $('#table-list').DataTable().ajax.reload();
+            }
         },
         success: function (response) {
             // Handle response sukses
@@ -395,6 +410,7 @@ function savebukti() {
 
 if(role == 'penghuni'){
     notifikasi();
+    dashboardpenghuni();
 }
 function notifikasi(){
     $.ajax({
@@ -424,4 +440,52 @@ function notifikasi(){
         },
     });
             
+}
+
+function dashboardpenghuni(){
+    $.ajax({
+        url: baseURL + "/listKamarDashboard",
+        type: "POST",
+        dataType: "json",
+        complete: function (response) {
+            
+        },
+        success: function (response) {
+            
+            es = response.data;
+            if (es.length >= 1) {
+                dataedit = es[0];
+                if(es[0].faskosp){
+                    fasilitas =  es[0].faskos+','+es[0].faskosp;
+                }else{
+                    fasilitas = es[0].faskos;
+                }
+
+                if(es[0].sisa_durasi < 0){
+                    durasi = 'Telat '+es[0].sisa_durasi+' hari' ;
+                }else if(es[0].sisa_durasi == 0){
+                    durasi = 'Hari Terakhir';
+                }else{
+                    durasi = es[0].sisa_durasi+' hari' ;
+                }
+
+                if(es[0].status_transaksi == null){
+                    var status = 'Belum Bayar';
+                    $("#btn-bayar").show();
+                }else{
+                    var status = 'Sudah Bayar'
+                    // $("#btn-bayar").hide();
+                }
+
+                $("#form-statustr").val(status);
+                $("#form-no").val(es[0].no_kamar);
+                $("#form-lantai").val(es[0].lantai);
+                $("#form-durasi").val(es[0].sisa_durasi+ ' Hari');
+                $("#form-fasilitas").val(fasilitas);
+                $("#form-tgl").val(window.datetostring2('yymmdd',es[0].tgl_awal)+ ' SD ' +window.datetostring2('yymmdd',es[0].tgl_akhir));
+                $("#form-tagihan").val(es[0].periode +' Bulan Rp.'+formatRupiah(es[0].biaya));
+            }
+            
+        }
+    })
 }

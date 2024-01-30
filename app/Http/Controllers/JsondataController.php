@@ -1185,7 +1185,7 @@ class JsonDataController extends Controller
                         
                         $idlogin    = strtolower($MasterClass->getSession('user_id'));
                         $rolelogin  = strtolower($MasterClass->getSession('role_name'));
-                        
+                        $fbln       = $request->fbln;
                         DB::beginTransaction();     
                         
                         $status = [];
@@ -1200,6 +1200,10 @@ class JsonDataController extends Controller
                         $where = " 
                             ht.user_id is not null 
                         ";
+                        if($fbln){
+                            $where .= " and DATE_FORMAT(created_at, '%Y-%m') = '$fbln' ";
+                        }
+
                         if($rolelogin != 'superadmin' && $rolelogin != 'penjaga' && $rolelogin != 'pemilik'){
                             $where  .=" AND ht.user_id = $idlogin ";
                         }
@@ -1510,6 +1514,55 @@ class JsonDataController extends Controller
             }
 
             return $MasterClass->Results($results);
+
+        }
+        public function getva(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                $status = [];
+                    $id = $MasterClass->getSession('user_id') ;
+                    // $id = 21 ;
+                        $select              = " 
+                            us.name,us.handphone,k.*,mk.tgl_awal,mk.tgl_akhir,tk.tipe as tipe_kamar,
+                            mk.jml_bulan_booking as jmlbulan,ur.role_name,
+                            GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
+                            GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp
+                        ";
+                        $table              = " 
+                            users us
+                            LEFT JOIN users_roles ur ON ur.id = us.role_id
+                            LEFT JOIN mapping_kamar mk ON us.id = mk.user_id
+                            LEFT JOIN kamar k ON k.id = mk.id_kamar
+                            LEFT JOIN tipe_kamar tk ON tk.id = mk.id_tipe
+                            LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
+                            LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id AND fs.penyedia = 'pihak kos'
+                            LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id AND fsp.penyedia = 'penghuni'
+
+                        ";
+                        $where              = " 
+                            us.id = $id
+                            GROUP BY
+                            us.name,us.handphone,mk.tgl_awal,mk.tgl_akhir,tk.tipe,
+                            mk.jml_bulan_booking,
+                            k.id,k.harga,k.no_kamar,k.lantai,ur.role_name
+                        ";
+                    $cekdata           = DB::select("select $select from $table where $where");
+                    $saved = $MasterClass->checkErrorModel($cekdata);
+                    // dd($saved);
+                    $status = $saved;
+        
+                    $results = [
+                        'code' => $status['code'],
+                        'info'  => $status['info'],
+                        'data'  =>  $status['data'],
+                    ];
+                return $MasterClass->Results($results);
+            }
+         
 
         }
     //CRUD FUNCTION
@@ -2528,7 +2581,7 @@ class JsonDataController extends Controller
                         if($cekdata){
                             DB::rollBack();
                             $results = [
-                                'code' => '1',
+                                'code' => '12',
                                 'info' => "Anda sudah booking kamar,silahkan untuk menghubungi pihak kos lewat WA",
                             ];
                             return $MasterClass->Results($results);
@@ -2548,9 +2601,10 @@ class JsonDataController extends Controller
                             'user_id'           => $penghuni,
                             'id_tipe'           => $tipekamar,
                             'jml_bulan_booking' => $jmlbulan,
-                            // 'tgl_awal'      => $tglawsal,
-                            // 'tgl_akhir'     => $tglakhir,
-                            'updated_at'    => $now,
+                            'tgl_awal'          => $tglawal,
+                            'tgl_akhir'         => $tglakhir,
+                            'booking_dtm'       => date('Y-m-d'),
+                            'updated_at'        => $now,
                         ];
                         $where     = [
                             'id_kamar'      => $id
@@ -2893,12 +2947,232 @@ class JsonDataController extends Controller
                         $select     = "
                                         DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE) as masa
                         ";
-                        $users      = DB::select("SELECT $select  FROM mapping_kamar mk where user_id = $userid ");
+                        $users      = DB::select("SELECT $select FROM mapping_kamar mk where user_id = $userid ");
                         $results = [
                             'code'  => '0',
                             'info'  => 'ok',
                             'data'  => $users
                         ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function SaveVa(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+                        $user_id            = $MasterClass->getSession('user_id') ;
+                        $select              = " 
+                            us.name,us.handphone,k.*,mk.tgl_awal,mk.tgl_akhir,tk.tipe as tipe_kamar,
+                            mk.jml_bulan_booking as jmlbulan,
+                            GROUP_CONCAT(fs.fasilitas SEPARATOR ',') as faskos,
+                            GROUP_CONCAT(fsp.fasilitas SEPARATOR ',') as faskosp
+                        ";
+                        $table              = " 
+                            users us
+                            LEFT JOIN mapping_kamar mk ON us.id = mk.user_id
+                            LEFT JOIN kamar k ON k.id = mk.id_kamar
+                            LEFT JOIN tipe_kamar tk ON tk.id = mk.id_tipe
+                            LEFT JOIN mapping_fasilitas mf ON k.id = mf.id_kamar
+                            LEFT JOIN fasilitas fs ON mf.id_fasilitas = fs.id AND fs.penyedia = 'pihak kos'
+                            LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id AND fsp.penyedia = 'penghuni'
+
+                        ";
+                        $where              = " 
+                            us.id = $user_id
+                            GROUP BY
+                            us.name,us.handphone,mk.tgl_awal,mk.tgl_akhir,tk.tipe,
+                            mk.jml_bulan_booking,
+                            k.id,k.harga,k.no_kamar,k.lantai
+                        ";
+                        $getkamar           = DB::select("select $select from $table where $where");
+                        
+                        $idkamar            = $getkamar[0]->id;
+                        $name               = $getkamar[0]->name;
+                        $handphone          = $getkamar[0]->handphone;
+                        $no_kamar           = $getkamar[0]->no_kamar;
+                        $tipe_kamar         = $getkamar[0]->tipe_kamar;
+                        $faskos             = $getkamar[0]->faskos;
+                        $faskosp            = $getkamar[0]->faskosp;
+                        $tgl_awal           = $getkamar[0]->tgl_awal;
+                        $tgl_akhir          = $getkamar[0]->tgl_akhir;
+                        $jmlbulan           = $getkamar[0]->jmlbulan;
+                        $harga              = $getkamar[0]->harga;
+                        $biaya              = $getkamar[0]->harga * $jmlbulan;
+                        $invoice            = date('YmdHis').'-'.$no_kamar.'-'.$user_id ;
+                        
+                        $now                = date('Y-m-d H:i:s');
+                        $docname            = 'bukti';
+
+                        $nama_file          = $_FILES['formbayar']['name'];
+                        $type		        = $_FILES['formbayar']['type'];
+                        $ukuran		        = $_FILES['formbayar']['size'];
+                        $tmp_name		    = $_FILES['formbayar']['tmp_name'];
+                        $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
+                        $alamatfile         = '../public/data/bukti/'; // directory file
+                        $uploaddir          = $alamatfile.$nama_file_upload; // directory file
+                        
+                        if (move_uploaded_file($tmp_name,$uploaddir)){
+                            chmod($uploaddir, 0777);
+
+                            $attrphoto     = [
+                                'user_id'   => $user_id,
+                                'invoice'   => $invoice,
+                                'tgl_awal'  => $tgl_awal,
+                                'tgl_akhir' => $tgl_akhir,
+                                'file'      => $nama_file_upload,
+                                'alamat'    => $alamatfile,
+                                'size'      => $ukuran,
+                                'tipe'      => $type,
+                                'jenis'     => 'bukti',
+                                'created_at'=> $now,
+                            ];
+                            $savefoto      = $MasterClass->saveGlobal('bukti_transaksi', $attrphoto );
+                            if($savefoto['code'] != $MasterClass::CODE_SUCCESS){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Gagal simpan data",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+
+                            
+                            $attrtransaksi     = [
+                                'invoice'           => $invoice,
+                                'user_id'           => $user_id,
+                                'name'              => $name,
+                                'handphone'         => $handphone,
+                                'no_kamar'          => $no_kamar,
+                                'tipe'              => $tipe_kamar,
+                                'fasilitas'         => $faskos,
+                                'fasilitas_penghuni'=> $faskosp,
+                                'tgl_awal'          => $tgl_awal,
+                                'tgl_akhir'         => $tgl_akhir,
+                                'tgl_awal_old'      => $tgl_awal,
+                                'tgl_akhir_old'     => $tgl_akhir,
+                                'jml_bulan'         => $jmlbulan,
+                                'biaya_kamar'       => $harga,
+                                'total_biaya'       => $biaya,
+                                'created_at'        => $now,
+                            ];
+                            $savetransaksi      = $MasterClass->saveGlobal('history_transaksi', $attrtransaksi );
+                            if($savetransaksi['code'] != $MasterClass::CODE_SUCCESS){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Gagal simpan data",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+
+                            $updaterole      = DB::update("UPDATE users us set role_id = (select id from users_roles where role_name='penghuni') where id= $user_id ");
+                            if($updaterole != 1){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Gagal simpan data",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+
+                        }
+
+                        DB::commit();
+                        $results = [
+                            'code'  => $MasterClass::CODE_SUCCESS,
+                            'info'  => 'ok',
+                        ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function batalbooking(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $data = json_decode($request->getContent());
+                        
+                        $mapkam     = DB::update("UPDATE mapping_kamar set tgl_awal = null ,tgl_akhir = null,jml_bulan_booking = null,booking_dtm = null,user_id = null  where user_id= ".$MasterClass->getSession('user_id'));
+                        if($mapkam == 1){
+                            DB::commit();
+                            
+                            $results = [
+                                'code' => '0',
+                                'info'  => 'ok',
+                            ];
+                        }else{
+                            $results = [
+                                'code' => '1',
+                                'info'  => 'Permintaan Gagal',
+                            ];
+                        }
+                            
             
             
                     } else {

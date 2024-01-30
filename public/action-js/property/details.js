@@ -7,7 +7,7 @@ cekdatakamar();
 fotokamar();
 var csrfToken = $('meta[name="csrf-token"]').attr("content");
 function modalbooking(){
-    $("#modal-booking").modal('show')
+    showpembayaran('booking');
 }
 
 var isObject = {};
@@ -45,7 +45,9 @@ function savebooking() {
         success: function (response) {
             // Handle response sukses
             if (response.code == 0) {
-                swal("Berhasil !", 'Berhasil disimpan', "success");
+                swal("Berhasil !", 'Berhasil disimpan', "success").then(function () {
+                    window.location.href = window.location.origin+'/kostan';
+                });
             } else {
                 swal("Oops...", response.info, "ERROR");
             }

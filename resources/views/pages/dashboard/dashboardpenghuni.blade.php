@@ -2,7 +2,7 @@
         <div class="row">
             <marquee id="marque" behavior="" direction="" style="display:none;background: red">
             </marquee><br>
-            <h2>Dashboard Monitoring Kamar</h2>
+            <h2>Dashboard</h2>
             <br>
             @if (Str::lower($role) == 'penjaga' || Str::lower($role) == 'superadmin')
                 <div class="col-lg-12">
@@ -37,36 +37,81 @@
                 </div>
             @endif
         </div><br>
+
+        @if ($role = 'penghuni')
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="table-list" class="table table-lg table-hover datatables">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>No Kamar</th>
-                                        <th>lantai</th>
-                                        <th>Fasilitas</th>
-                                        <th>Status</th>
-                                        <th>Masa Kos</th>
-                                        <th>Durasi Bayar</th>
-                                        <th>Penghuni</th>
-                                        <th>Tagihan (Bulan)</th>
-                                        <th>Tagihan (Rp)</th>
-                                        <th>Status Bayar</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <label>Status Pembayaran</label>
+                                <input readonly id="form-statustr" name="form-status" type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-3">
+                                <label>No Kamar</label>
+                                <input readonly id="form-no" name="form-no" type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-3">
+                                <label>Lantai</label>
+                                <input readonly id="form-lantai" name="form-lantai" type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-3">
+                                <label>Sisa Durasi</label>
+                                <input readonly id="form-durasi" name="form-durasi" type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Fasilitas</label>
+                                <input readonly id="form-fasilitas" name="form-fasilitas" type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Tanggal Kos</label>
+                                <input readonly id="form-tgl" name="form-tgl" type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Tagihan</label>
+                                <input readonly id="form-tagihan" name="form-tagihan" type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="submit" id="btn-bayar" class="btn btn-sgn" style="color:#e12a2a;width:100%;height:35px;font-size:14px;margin-top: 27px;">Bayar / Lihat Bill</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        @else
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="table-list" class="table table-lg table-hover datatables">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>No Kamar</th>
+                                            <th>lantai</th>
+                                            <th>Fasilitas</th>
+                                            <th>Status</th>
+                                            <th>Masa Kos</th>
+                                            <th>Durasi Bayar</th>
+                                            <th>Penghuni</th>
+                                            <th>Tagihan (Bulan)</th>
+                                            <th>Tagihan (Rp)</th>
+                                            <th>Status Bayar</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <div class="modal fade" id="modal-bill">
             <div class="modal-dialog modal-lg">
