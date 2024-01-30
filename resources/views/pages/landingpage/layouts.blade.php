@@ -260,7 +260,7 @@ https://templatemo.com/tm-591-villa-agency
                             $("#form-ifhraga").val(response.data[0].harga);
                             $("#form-ifbiaya").val(response.data[0].harga * response.data[0].jmlbulan);
 
-                            swal("Oopss", 'Anda sudah booking kamar sebelumnya , silahkan lakukan pembayaran atau batalkan pembayaran terlebih dahulu', "warning")
+                            swal("Perhatian !!", 'Lakukan Pembayaran dalam 1x24 jam atau otomatis tercancel ,anda sudah booking kamar sebelumnya , silahkan lakukan pembayaran atau batalkan pembayaran terlebih dahulu', "warning")
                             .then(function (e){
                                 if(p){
                                     if(p == 'booking'){
