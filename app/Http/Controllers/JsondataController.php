@@ -2898,7 +2898,53 @@ class JsonDataController extends Controller
 
                         DB::beginTransaction();     
 
-                        $users      = DB::update("DELETE FROM mapping_kamar mk WHERE DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE)  < -7");
+                        $users      = DB::update("UPDATE mapping_kamar mk set tgl_awal = null ,tgl_akhir = null,jml_bulan_booking = null,booking_dtm = null,user_id = null WHERE DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE)  < -7");
+                        $results = [
+                            'code' => '0',
+                            'info'  => 'ok',
+                        ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function cancelbooking(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $users      = DB::update("UPDATE mapping_kamar mk set tgl_awal = null ,tgl_akhir = null,jml_bulan_booking = null,booking_dtm = null,user_id = null WHERE DATEDIFF(CONVERT(mk.booking_dtm,date) , CURRENT_DATE)  < -2");
                         $results = [
                             'code' => '0',
                             'info'  => 'ok',

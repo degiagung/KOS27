@@ -93,4 +93,17 @@
         });
                 
     }
+    cancelbooking();
+    function cancelbooking(){
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            headers: {
+                'X-CSRF-Token': $('meta[name="_token"]').attr('content')
+            },  
+            url: window.location.origin + '/cancelbooking',
+            
+        });
+                
+    }
 </script>
