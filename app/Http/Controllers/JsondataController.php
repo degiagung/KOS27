@@ -2897,7 +2897,7 @@ class JsonDataController extends Controller
                     if ($request->isMethod('post')) {
 
                         DB::beginTransaction();     
-
+ 
                         $users      = DB::update("UPDATE mapping_kamar mk set tgl_awal = null ,tgl_akhir = null,jml_bulan_booking = null,booking_dtm = null,user_id = null WHERE DATEDIFF(CONVERT(mk.tgl_akhir,date) , CURRENT_DATE)  < -7");
                         $results = [
                             'code' => '0',
