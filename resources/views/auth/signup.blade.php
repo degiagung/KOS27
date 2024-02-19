@@ -24,7 +24,7 @@
                         {{-- <form action="index.html">
                         @csrf --}}
                         <div class="mb-3">
-                            <input type="text" class="form-control" placeholder="Name" name="name" id="form-name" aria-label="Name" aria-describedby="name" value="{{ old('name') }}">
+                            <input type="text" class="form-control" placeholder="Name" name="nama" id="form-name" aria-label="Name" aria-describedby="name" value="{{ old('name') }}">
                             @error('name')
                             <p class="text-danger text-xs mt-2">{{ $message }}</p>
                             @enderror
@@ -42,7 +42,7 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <input type="password" class="form-control" placeholder="Password" name="password" id="form-password" aria-label="Password" aria-describedby="password-addon">
+                            <input type="password" class="form-control" placeholder="Kata Sandi" name="password" id="form-password" aria-label="Password" aria-describedby="password-addon">
                             @error('password')
                             <p class="text-danger text-xs mt-2">{{ $message }}</p>
                             @enderror
@@ -59,7 +59,7 @@
                         <div class="text-center">
                             <button type="submit" id="save-btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Simpan</button>
                         </div>
-                        <p class="text-sm mt-3 mb-0">Sudah Punya Akun? <a href="{{ route('login') }}" class="text-dark font-weight-bolder">Sign in</a></p>
+                        <p class="text-sm mt-3 mb-0">Sudah Punya Akun? <a href="{{ route('login') }}" class="text-dark font-weight-bolder">Masuk</a></p>
                         {{-- </form> --}}
                     </div>
                 </div>

@@ -1085,7 +1085,7 @@ class JsonDataController extends Controller
                             LEFT JOIN users us ON mk.user_id = us.id
                             LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id and fsp.penyedia = 'penghuni'
                             LEFT JOIN history_transaksi ht ON ht.user_id = mk.user_id AND ht.tgl_awal = mk.tgl_awal
-                                AND ht.tgl_akhir = mk.tgl_akhir
+                                AND ht.tgl_akhir = mk.tgl_akhir AND k.no_kamar = ht.no_kamar
                         ";
                         $where = " 
                             mk.user_id is not null and mk.tgl_awal is not null

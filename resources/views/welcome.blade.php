@@ -95,7 +95,7 @@
                         <h4 class="heading mb-0">Latest Booked</h4>
                     </div>
                     <div class="table-responsive px-4 pb-4">
-                        <table id="table-latest-booked"  class="table dataTable no-footer" role="grid" aria-describedby="projects-tbl_info">
+                        <table id="table-latest-booked"  class="table table-bordered table-stripeddataTable no-footer" role="grid" aria-describedby="projects-tbl_info">
                             <thead>
                                 <th>No</th>
                                 <th>No Booking</th>

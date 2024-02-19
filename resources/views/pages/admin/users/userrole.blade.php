@@ -30,7 +30,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="table-responsive">
-                                            <table id="table-list" class="table table-lg table-hover datatables">
+                                            <table id="table-list" class="table table-bordered table-striped table-lg table-hover datatables">
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
@@ -51,7 +51,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="table-responsive">
-                                            <table id="table-list-json" class="table table-lg table-hover datatables">
+                                            <table id="table-list-json" class="table table-bordered table-striped table-lg table-hover datatables">
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>

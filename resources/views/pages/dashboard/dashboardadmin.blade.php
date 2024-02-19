@@ -40,7 +40,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="table-list" class="table table-lg table-bordered table-striped datatables">
+                        <table id="table-list" class="table table-bordered table-striped table-lg table-bordered table-striped datatables">
                             <thead>
                                 <tr>
                                     <th>No</th>
