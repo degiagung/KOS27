@@ -30,10 +30,12 @@
                       @enderror
                     </div>
                     @if ($errors->has('email'))
-						<div class="form-group mb-3">
-							<span class="badge bg-danger mb-2">{{ $errors->first('email') }}</span>
-						</div>
-					@endif
+                      <div class="form-group mb-3">
+                        <span class="badge bg-danger mb-2">{{ $errors->first('email') }}</span>
+                      </div>
+                    @endif
+                    <a href="{{ route('forgot-password') }}" class="text-info text-gradient font-weight-bold" style="font-size:smaller;">Lupa Password</a>
+
                     <div class="text-center">
                       <button type="submit" class="btn bg-gradient-info w-100 mt-4 mb-0">Masuk</button>
                     </div>

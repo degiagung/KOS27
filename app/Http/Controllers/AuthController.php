@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use App\Models\MenusAccess;
 use App\Helpers\Master;
+use App\Mail\sendemail;
+use Illuminate\Support\Facades\Mail;
+
 
 
 class AuthController extends Controller
@@ -130,5 +133,66 @@ class AuthController extends Controller
         ];
 
         return $MasterClass->Results($results);
+    }
+    public function forgotpassword()
+    {
+        $javascriptFiles = [
+                asset('action-js/auth/forgotpassword.js'),
+            ];
+        
+            $cssFiles = [
+                // asset('css/main.css'),
+                // asset('css/custom.css'),
+            ];
+            $baseURL = url('/');
+            $varJs = [
+                'const baseURL = "' . $baseURL . '"',
+
+            ];
+            $data = [
+                'javascriptFiles' => $javascriptFiles,
+                'cssFiles' => $cssFiles,
+                'varJs'=> $varJs,
+                 // Menambahkan base URL ke dalam array
+            ];
+            
+            return view('auth.forgotpassword')
+                ->with($data);
+    }
+    public function linkforgot(Request $request)
+    {
+        $email = $request->email;
+        // dd($credentials);
+        // $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        // $credentials = [
+        //     $field => $login,
+        //     'password' => $password
+        // ];
+
+        if ($email) {
+            $sendmail = new sendemail();
+            $cekemail = DB::select("select * from users where email like '$email'");
+            if(count($cekemail) >= 1){
+                
+                $sendemail  = new sendemail();
+                $password1  = $cekemail[0]->name.date('Ymdhis');
+                $password   = bcrypt($password1); 
+                // dd($email);
+                DB::select("update users set password = '$password' where id = ".$cekemail[0]->id);
+                Mail::raw('Silahkan login dengan password '.$password1, function ($message) use($email) {
+                $message->to($email)
+                    ->subject('reset password');
+                });
+                // Mail::to($email)->send($sendemail);
+
+                return redirect()->back()->with(['success' => 'Terkirim ke email']);
+            }else{
+                return redirect()->back()->with(['error' => 'Email tidak ditemukan']);
+            }
+
+        } else {
+            return redirect()->back()->with(['error' => 'Email tidak boleh kosong']);
+        }
     }
 }

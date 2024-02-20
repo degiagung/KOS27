@@ -24,6 +24,8 @@ Route::get('/login', [AuthController::class, 'index'])->name('login')->middlewar
 // Rute untuk melakukan proses login
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/sign-up', [AuthController::class, 'signup'])->name('sign-up')->middleware('guest');
+Route::get('/forgot-password', [AuthController::class, 'forgotpassword'])->name('forgot-password')->middleware('guest');
+Route::post('/linkforgot', [AuthController::class, 'linkforgot'])->name('linkforgot');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/createaccount', [AuthController::class, 'createaccount'])->name('createaccount');
 
