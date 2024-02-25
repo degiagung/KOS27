@@ -3088,7 +3088,7 @@ class JsonDataController extends Controller
             if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
                 try {
                     if ($request->isMethod('post')) {
-
+                        
                         DB::beginTransaction();     
                         $user_id            = $MasterClass->getSession('user_id') ;
                         $select              = " 
@@ -3126,10 +3126,10 @@ class JsonDataController extends Controller
                         $tgl_awal           = $getkamar[0]->tgl_awal;
                         $tgl_akhir          = $getkamar[0]->tgl_akhir;
                         $jmlbulan           = $getkamar[0]->jmlbulan;
-                        $bank               = $getkamar[0]->bank;
                         $harga              = $getkamar[0]->harga;
                         $biaya              = $getkamar[0]->harga * $jmlbulan;
                         $invoice            = date('YmdHis').'-'.$no_kamar.'-'.$user_id ;
+                        $bank               = $request->bank;
                         
                         $now                = date('Y-m-d H:i:s');
                         $docname            = 'bukti';

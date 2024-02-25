@@ -163,6 +163,8 @@ https://templatemo.com/tm-591-villa-agency
     <script src="{{ asset('template/admin/vendor/sweetalert2/dist/sweetalert2.min.js') }}" aria-hidden="true"></script>
 
     <script>
+        // console.log(window.location.origin);
+        // var window.location.origin = window.location.origin;
         
         $("#form-bank").change( function (e) {
             $("#form-va").val('');
@@ -293,7 +295,7 @@ https://templatemo.com/tm-591-villa-agency
             }).then(function (e) {
                 if (e.value) {
                     $.ajax({
-                        url: baseURL + "/batalbooking",
+                        url: window.location.origin + "/batalbooking",
                         type: "POST",
                         dataType: "json",
                         contentType: "application/json",
@@ -341,7 +343,7 @@ https://templatemo.com/tm-591-villa-agency
             formData.append('bank',$("#form-bank").val());
 
             $.ajax({
-                url: baseURL + "/SaveVa",
+                url: window.location.origin + "/SaveVa",
                 type: "POST",
                 data: formData,
                 contentType: false,
@@ -363,7 +365,7 @@ https://templatemo.com/tm-591-villa-agency
                         swal("Berhasil !", 'Pembayaran Berhasil, Silahkan login ulang untuk melihat fitur-fitur penghuni', "success").then(function () {
                                 
                             $.ajax({
-                                url: baseURL + "/logout",
+                                url: window.location.origin + "/logout",
                                 type: "POST",
                                 headers: {
                                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
