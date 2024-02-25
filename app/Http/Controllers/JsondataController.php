@@ -1060,7 +1060,7 @@ class JsonDataController extends Controller
                             tk.tipe,
                             us.handphone,
                             sum(fsp.biaya) as biayatambah,k.harga,
-                            ht.id as status_transaksi,
+                            ht.id idtrans ,
                             ht.created_at as tgltransaksi,
                             ht.total_biaya totaltransaksi,
                             ht.tgl_awal tgltransaksi1,
@@ -1073,7 +1073,10 @@ class JsonDataController extends Controller
                             ht.jml_bulan blntransaksi,
                             ht.handphone hptranaksi,
                             ht.invoice,
-                            mk.jml_bulan_booking
+                            ht.bank,
+                            ht.status as status_transaksi,
+                            mk.jml_bulan_booking,
+                            bt.file,bt.alamat
                         ";
                         
                         $table = "
@@ -1086,6 +1089,7 @@ class JsonDataController extends Controller
                             LEFT JOIN fasilitas fsp ON mf.id_fasilitas = fsp.id and fsp.penyedia = 'penghuni'
                             LEFT JOIN history_transaksi ht ON ht.user_id = mk.user_id AND ht.tgl_awal = mk.tgl_awal
                                 AND ht.tgl_akhir = mk.tgl_akhir AND k.no_kamar = ht.no_kamar
+                            LEFT JOIN bukti_transaksi bt ON bt.invoice = ht.invoice
                         ";
                         $where = " 
                             mk.user_id is not null and mk.tgl_awal is not null
@@ -1131,7 +1135,10 @@ class JsonDataController extends Controller
                             ht.jml_bulan,
                             ht.handphone,
                             ht.invoice,
-                            mk.jml_bulan_booking
+                            ht.bank,
+                            mk.jml_bulan_booking,
+                            ht.status,
+                            bt.file,bt.alamat
                             ORDER BY mk.tgl_akhir asc
                         ";
 
@@ -2434,7 +2441,7 @@ class JsonDataController extends Controller
                     if ($request->isMethod('post')) {
 
                         DB::beginTransaction();     
-
+                        $rolelogin  = strtolower($MasterClass->getSession('role_name'));
                         $idkamar            = $request->idkamar;
                         $user_id            = $request->user_id;
                         $name               = $request->name;
@@ -2450,6 +2457,7 @@ class JsonDataController extends Controller
                         $harga              = $request->harga;
                         $biayatambah        = $request->biayatambah;
                         $biaya              = $request->biaya;
+                        $bank               = $request->bank;
                         $jenispembayaran    = $request->jenispembayaran;
                         $invoice            = date('YmdHis').'-'.$no_kamar.'-'.$user_id ;
                         if($biayatambah == 'null'){
@@ -2509,7 +2517,12 @@ class JsonDataController extends Controller
                                 return $MasterClass->Results($results);
                             }
 
-                            
+                            if($rolelogin == 'superadmin' || $rolelogin == 'pemilik'){
+                                $statusbayar = '1';
+                            }else{
+                                $statusbayar = '2';
+
+                            }
                             $attrtransaksi     = [
                                 'invoice'           => $invoice,
                                 'user_id'           => $user_id,
@@ -2528,6 +2541,8 @@ class JsonDataController extends Controller
                                 'biaya_tambahan'    => $biayatambah,
                                 'total_biaya'       => $biaya,
                                 'created_at'        => $now,
+                                'status'            => $statusbayar,
+                                'bank'              => $bank,
                             ];
                             $savetransaksi      = $MasterClass->saveGlobal('history_transaksi', $attrtransaksi );
                             if($savetransaksi['code'] != $MasterClass::CODE_SUCCESS){
@@ -3111,6 +3126,7 @@ class JsonDataController extends Controller
                         $tgl_awal           = $getkamar[0]->tgl_awal;
                         $tgl_akhir          = $getkamar[0]->tgl_akhir;
                         $jmlbulan           = $getkamar[0]->jmlbulan;
+                        $bank               = $getkamar[0]->bank;
                         $harga              = $getkamar[0]->harga;
                         $biaya              = $getkamar[0]->harga * $jmlbulan;
                         $invoice            = date('YmdHis').'-'.$no_kamar.'-'.$user_id ;
@@ -3174,7 +3190,9 @@ class JsonDataController extends Controller
                                 'tgl_akhir_old'     => $tgl_akhir,
                                 'jml_bulan'         => $jmlbulan,
                                 'biaya_kamar'       => $harga,
+                                'status'            => '2',
                                 'total_biaya'       => $biaya,
+                                'bank'              => $bank,
                                 'created_at'        => $now,
                             ];
                             $savetransaksi      = $MasterClass->saveGlobal('history_transaksi', $attrtransaksi );
@@ -3248,6 +3266,64 @@ class JsonDataController extends Controller
                         $data = json_decode($request->getContent());
                         
                         $mapkam     = DB::update("UPDATE mapping_kamar set tgl_awal = null ,tgl_akhir = null,jml_bulan_booking = null,booking_dtm = null,user_id = null  where user_id= ".$MasterClass->getSession('user_id'));
+                        if($mapkam == 1){
+                            DB::commit();
+                            
+                            $results = [
+                                'code' => '0',
+                                'info'  => 'ok',
+                            ];
+                        }else{
+                            $results = [
+                                'code' => '1',
+                                'info'  => 'Permintaan Gagal',
+                            ];
+                        }
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function updatepembayaran(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+
+                        $id = $request->id ;
+                        
+                        $mapkam     = DB::update("UPDATE history_transaksi set status = 1 where id= ".$id);
                         if($mapkam == 1){
                             DB::commit();
                             

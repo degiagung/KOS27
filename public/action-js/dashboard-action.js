@@ -39,6 +39,7 @@ $.extend($.fn.dataTable.defaults, {
     },
 });
 
+var isObject = {};
 $('.select2').select2();
 $("#form-pembayaran").select2({
     dropdownParent: $("#modal-update"),
@@ -59,8 +60,11 @@ $("#filter-btn").on('click',function(e){
     getListData()
 })
 $("#btn-bayar").on('click',function(e){
-    if(dataedit.status_transaksi == null){
-        
+    if(dataedit.status_transaksi == 1){
+        showbill(dataedit);
+    }else if(dataedit.status_transaksi == 2){
+        swalwarning('Pembayaran dalam pengecekan');
+    }else{
         $("#form-status").select2({
             dropdownParent: $(".modal"),
         });
@@ -68,8 +72,6 @@ $("#btn-bayar").on('click',function(e){
         $("#btn-update").attr("onclick","savebukti()");
     
         $("#modal-update").modal('show');
-    }else{
-        showbill(dataedit);
     }
 })
 
@@ -182,12 +184,14 @@ function getListData() {
                 return formatRupiah(row.biaya) ;
             }},
             { mRender: function (data, type, row) {
-                if(row.status_transaksi == null)
-                    return `<a style="cursor:pointer;color:#fff;background: red;" class="showbilln" > Belum Bayar</a>`
-                    else
+                if(row.status_transaksi == '1'){
                     return `<a style="cursor:pointer;color:#fff;background: green;" class="showbill" > Sudah Bayar</a>`
+                }else if(row.status_transaksi == '2'){
+                    return `<a style="cursor:pointer;color:#fff;background: black;" class="showbilln" > Perlu dicek</a>`
+                }else{
+                    return `<a style="cursor:pointer;color:#fff;background: red;" class="showbilln" > Belum Bayar</a>`
                 }
-            },
+            }},
             { 
                 mRender: function (data, type, row) {
                     
@@ -220,9 +224,29 @@ function getListData() {
             $(rows)
                 .find(".showbill")
                 .on("click", function () {
+                    
+                    $(".fotobukti").empty();
                     var tr = $(this).closest("tr");
                     var rowData = dtpr.row(tr).data();
-                    showbill(rowData);
+                    isObject = rowData;
+                    if(rowData.status_transaksi == '1'){
+                        showbill(rowData);
+                    }else{
+                        $("#form-bankcek").val(rowData.bank).trigger('change');
+                        $("#form-blncek").val(rowData.periode);
+                        $("#form-bayarcek").val(formatRupiah(rowData.biaya));
+                        file = rowData.alamat.replaceAll('../public','')+rowData.file;
+                        content = '';
+                        content += `
+                            <div class="col-lg-5">
+                                <img src="`+file+`" style="width:300px;height: 150px;margin-top: 10px;" alt="">
+                            </div>
+                        `;
+
+                        $(".fotobukti").append(content);
+                        $("#modal-cektransaksi").modal('show');
+
+                    }
                 });
             $(rows)
                 .find(".showbilln")
@@ -347,7 +371,8 @@ function editdata(p){
 }
 
 function savebukti() {
-    let jmlbulan    = $("#form-bln").val() ; 
+    let bank            = $("#form-bank").val() ; 
+    let jmlbulan        = $("#form-bln").val() ; 
     let jenispembayaran = $("#form-pembayaran").val();
     if(jenispembayaran == '1'){
         jmlbulan = dataedit.jml_bulan_booking ;
@@ -380,6 +405,7 @@ function savebukti() {
     formData.append('jmlbulan',jmlbulan);
     formData.append('biaya',(dataedit.harga * jmlbulan) + (dataedit.biayatambah * jmlbulan) );
     formData.append('jenispembayaran',jenispembayaran);
+    formData.append('bank',bank);
 
     $.ajax({
         url: baseURL + "/saveBukti",
@@ -405,6 +431,39 @@ function savebukti() {
             // Handle response sukses
             if (response.code == 0) {
                 swal("Berhasil !", 'Bukti Berhasil disimpan', "success");
+            } else {
+                sweetAlert("Oops...", response.info, "ERROR");
+            }
+        },
+        error: function (xhr, status, error) {
+            sweetAlert("Oops...", "ERROR", "ERROR");
+        },
+    });
+}
+
+function accbyar() {
+    
+    $.ajax({
+        url: baseURL + "/updatepembayaran",
+        type: "POST",
+        data: {
+            id   : isObject.idtrans,
+        },
+        dataType: "json",
+        beforeSend: function () {
+            Swal.fire({
+                title: "Loading",
+                text: "Please wait...",
+            });
+        },
+        complete: function () {
+            $('#table-list').DataTable().ajax.reload();
+        },
+        success: function (response) {
+            // Handle response sukses
+            if (response.code == 0) {
+                swal("Berhasil !", '', "success");
+                $("#modal-cektransaksi").modal("hide");
             } else {
                 sweetAlert("Oops...", response.info, "ERROR");
             }
@@ -500,7 +559,8 @@ function dashboardpenghuni(){
 $("#form-bank").change( function (e) {
             $("#form-va").val('');
             if($("#form-bank").val() != ''){
-                $(".divva").show();
+                $(".divva").hide();
+                // $(".divva").show();
                 const day = new Date();
                 let y = day.getFullYear();
                 let m = day.getMonth();

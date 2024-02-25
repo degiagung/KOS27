@@ -102,10 +102,11 @@ https://templatemo.com/tm-591-villa-agency
                         <div class="col-sm-9">
                             <select id="form-bank" style="width: 100%;">
                                 <option value="">Pilih Bank</option>
-                                <option value="1">BCA</option>
-                                <option value="1">BNI</option>
+                                <option value="bca">BCA (<b>063 123 7460</b> MAHFUDZ)</option>
+                                <option value="mandiri">MANDIRI (<b>13200 2442 7867</b> MAHFUDZ)</option>
+                                {{-- <option value="1">BNI</option>
                                 <option value="1">BRI</option>
-                                <option value="1">Mandiri</option>
+                                <option value="1">Mandiri</option> --}}
                             </select>
                         </div>
                     </div>
@@ -166,7 +167,8 @@ https://templatemo.com/tm-591-villa-agency
         $("#form-bank").change( function (e) {
             $("#form-va").val('');
             if($("#form-bank").val() != ''){
-                $(".divva").show();
+                $(".divva").hide();
+                // $(".divva").show();
                 const day = new Date();
                 let y = day.getFullYear();
                 let m = day.getMonth();
@@ -336,6 +338,7 @@ https://templatemo.com/tm-591-villa-agency
             }
             const formData    = new FormData(document.getElementById("formbayar"));
             formData.append('va',va);
+            formData.append('bank',$("#form-bank").val());
 
             $.ajax({
                 url: baseURL + "/SaveVa",

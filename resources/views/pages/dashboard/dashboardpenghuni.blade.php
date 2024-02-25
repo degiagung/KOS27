@@ -142,6 +142,16 @@
                 <div class="modal-body">
                     <center>
                         <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Bank</label>
+                            <div class="col-sm-9">
+                                <select id="form-bank" style="width: 100%;">
+                                    {{-- <option value="">Pilih Bank</option> --}}
+                                    <option value="bca">BCA (<b>063 123 7460</b> MAHFUDZ)</option>
+                                    <option value="mandiri">MANDIRI (<b>13200 2442 7867</b> MAHFUDZ)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
                             <label class="col-sm-3 col-form-label">Bukti Transaksi</label>
                             <div class="col-sm-9">
                                 <form role="form" class="" id="formbukti" method="post" type="post" enctype="multipart/form-data">

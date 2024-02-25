@@ -50,6 +50,7 @@ Route::middleware(['auth'])->group(function () { // harus login terlebih dahulu
     Route::post('/cekdatakamar', [JsonDataController::class, 'cekdatakamar'])->name('cekdatakamar');
     Route::post('/getdataprofile', [JsonDataController::class, 'getdataprofile'])->name('getdataprofile');
     Route::post('/editprofile', [JsonDataController::class, 'editprofile'])->name('editprofile');
+    Route::post('/updatepembayaran', [JsonDataController::class, 'updatepembayaran'])->name('updatepembayaran');
 
     Route::middleware(['role:Superadmin'])->group(function () {
         Route::post('/generate', [GenerateController::class, 'generate'])->name('generate');

@@ -98,11 +98,9 @@
                             <label class="col-sm-3 col-form-label">Bank</label>
                             <div class="col-sm-9">
                                 <select id="form-bank" style="width: 100%;">
-                                    <option value="">Pilih Bank</option>
-                                    <option value="1">BCA</option>
-                                    <option value="1">BNI</option>
-                                    <option value="1">BRI</option>
-                                    <option value="1">Mandiri</option>
+                                    {{-- <option value="">Pilih Bank</option> --}}
+                                    <option value="1">BCA (<b>063 123 7460</b> MAHFUDZ)</option>
+                                    <option value="1">MANDIRI (<b>13200 2442 7867</b> MAHFUDZ)</option>
                                 </select>
                             </div>
                         </div>
@@ -142,6 +140,51 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="btn-update">Simpan Bukti</button>
             </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-cektransaksi">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Cek Pembayaran</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <center>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Bank</label>
+                        <div class="col-sm-9">
+                            <select id="form-bankcek" style="width: 100%;" disabled>
+                                {{-- <option value="">Pilih Bank</option> --}}
+                                <option value="bca">BCA (<b>063 123 7460</b> MAHFUDZ)</option>
+                                <option value="mandiri">MANDIRI (<b>13200 2442 7867</b> MAHFUDZ)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row divbln" style="display:none">
+                        <label class="col-sm-3 col-form-label">Jml Bulan</label>
+                        <div class="col-sm-9">
+                            <input id="form-blncek" name="form-bln" type="number" class="form-control" min="1" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row divbln" style="display:none">
+                        <label class="col-sm-3 col-form-label">Jumlah Bayar</label>
+                        <div class="col-sm-9">
+                            <input id="form-bayarcek" name="form-bln" type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="margin-top: 15px;padding:0px">
+                      <div class="row fotobukti">
+                        
+                      </div>
+                    </div>
+                </center>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="accbyar()">Sudah Bayar</button>
+           </div>
             </div>
         </div>
     </div>
