@@ -98,7 +98,7 @@
                             <label class="col-sm-3 col-form-label">Bank</label>
                             <div class="col-sm-9">
                                 <select id="form-bank" style="width: 100%;">
-                                    {{-- <option value="">Pilih Bank</option> --}}
+                                    <option value="">Pilih Bank</option>
                                     <option value="1">BCA (<b>063 123 7460</b> MAHFUDZ)</option>
                                     <option value="1">MANDIRI (<b>13200 2442 7867</b> MAHFUDZ)</option>
                                 </select>
@@ -162,13 +162,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mb-3 row divbln" style="display:none">
+                    <div class="mb-3 row divbln">
                         <label class="col-sm-3 col-form-label">Jml Bulan</label>
                         <div class="col-sm-9">
                             <input id="form-blncek" name="form-bln" type="number" class="form-control" min="1" readonly>
                         </div>
                     </div>
-                    <div class="mb-3 row divbln" style="display:none">
+                    <div class="mb-3 row divbln">
                         <label class="col-sm-3 col-form-label">Jumlah Bayar</label>
                         <div class="col-sm-9">
                             <input id="form-bayarcek" name="form-bln" type="text" class="form-control" readonly>

@@ -145,7 +145,7 @@
                             <label class="col-sm-3 col-form-label">Bank</label>
                             <div class="col-sm-9">
                                 <select id="form-bank" style="width: 100%;">
-                                    {{-- <option value="">Pilih Bank</option> --}}
+                                    <option value="">Pilih Bank</option>
                                     <option value="bca">BCA (<b>063 123 7460</b> MAHFUDZ)</option>
                                     <option value="mandiri">MANDIRI (<b>13200 2442 7867</b> MAHFUDZ)</option>
                                 </select>

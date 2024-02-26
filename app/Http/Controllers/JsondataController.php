@@ -639,6 +639,11 @@ class JsonDataController extends Controller
                                 AND mk.user_id is not  null and ur.role_name = 'guest'
                             ";
                         }
+                        $rolelogin  = strtolower($MasterClass->getSession('role_name'));
+                        $idlogin    = strtolower($MasterClass->getSession('user_id'));
+                        if($rolelogin == 'penghuni'){
+                            $where  .=" AND us.id = $idlogin ";
+                        }
 
                         
                         $where .= " 
