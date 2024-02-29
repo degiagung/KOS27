@@ -2099,7 +2099,7 @@ class JsonDataController extends Controller
                                 $MasterClass->deleteGlobal('foto_kamar', [
                                 'id_kamar'      => $id,
                                 'jenis'         => 'lainnya'
-                            ]   );
+                                ]   );
                                 for ($i=0; $i < count($_FILES['filelainnya']['name']); $i++) { 
         
                                     $nama_file          = $_FILES['filelainnya']['name'][$i];
@@ -3340,6 +3340,185 @@ class JsonDataController extends Controller
                             $results = [
                                 'code' => '1',
                                 'info'  => 'Permintaan Gagal',
+                            ];
+                        }
+                            
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function savebuktiperbaikan(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+
+                        DB::beginTransaction();     
+                        $rolelogin  = strtolower($MasterClass->getSession('role_name'));
+                        $idkamar    = $request->id;
+                        
+                        $now                = date('Y-m-d H:i:s');
+                        $docname            = 'bukti';
+                        $idbukti            = [];
+                        if(!empty($_FILES['formbukti']['name'])){
+                            for ($i=0; $i < count($_FILES['formbukti']['name']); $i++) { 
+    
+                                $nama_file          = $_FILES['formbukti']['name'][$i];
+                                $type		        = $_FILES['formbukti']['type'][$i];
+                                $ukuran		        = $_FILES['formbukti']['size'][$i];
+                                $tmp_name		    = $_FILES['formbukti']['tmp_name'][$i];
+                                $nama_file_upload   = strtolower(str_replace(' ','_',$docname.'-'.$nama_file));
+                                $alamatfile         = '../public/data/kos/'; // directory file
+                                $uploaddir          = $alamatfile.$nama_file_upload; // directory file
+                                if($ukuran > 2000000){
+                                    DB::rollBack();
+                                    $results = [
+                                        'code' => '1',
+                                        'info'  => "Ukuran gambar max 2 MB",
+                                    ];
+                                    return $MasterClass->Results($results);
+                                }
+                                if (move_uploaded_file($tmp_name,$uploaddir)){
+                                    chmod($uploaddir, 0777);
+
+                                    $attrphoto     = [
+                                        
+                                        'file'      => $nama_file_upload,
+                                        'alamat'    => $alamatfile,
+                                        'size'      => $ukuran,
+                                        'tipe'      => $type,
+                                        'jenis'     => 'bukti perbaikan',
+                                        'created_at'=> $now,
+                                    ];
+                                    $savefoto      = $MasterClass->saveGlobal('bukti_transaksi', $attrphoto );
+                                    
+                                    if($savefoto['code'] != $MasterClass::CODE_SUCCESS){
+                                        DB::rollBack();
+                                        $results = [
+                                            'code' => '1',
+                                            'info'  => "Gagal upload",
+                                        ];
+                                        return $MasterClass->Results($results);
+                                    }
+
+                                    array_push($idbukti,$savefoto['data']);
+                                }
+
+                            }
+                            $attrkamar     = [
+                                'bukti_perbaikan'   => implode(',',$idbukti)
+                            ];
+                            $where     = [
+                                'id_kamar' => $idkamar
+                            ];
+                            
+                            $savedkamar      = $MasterClass->updateGlobal('mapping_kamar', $attrkamar, $where );
+
+                            if($savedkamar['code'] != '0'){
+                                DB::rollBack();
+                                $results = [
+                                    'code' => '1',
+                                    'info'  => "Gagal update data kamar",
+                                ];
+                                return $MasterClass->Results($results);
+                            }
+                        }else{
+                            DB::rollBack();
+                            $results = [
+                                'code' => '1',
+                                'info'  => "Gagal upload",
+                            ];
+                            return $MasterClass->Results($results);
+                        }
+
+
+                        DB::commit();
+                        $results = [
+                            'code' => '0',
+                            'info'  => "Berhasil",
+                        ];
+            
+            
+                    } else {
+                        $results = [
+                            'code' => '103',
+                            'info'  => "Method Failed",
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Roll back the transaction in case of an exception
+                    $results = [
+                        'code' => '102',
+                        'info'  => $e->getMessage(),
+                    ];
+        
+                }
+            }
+            else {
+        
+                $results = [
+                    'code' => '403',
+                    'info'  => "Unauthorized",
+                ];
+                
+            }
+
+            return $MasterClass->Results($results);
+
+        }
+        public function getfotoperbaikan(Request $request){
+
+            $MasterClass = new Master();
+
+            $checkAuth = $MasterClass->Authenticated($MasterClass->getSession('user_id'));
+            
+            if($checkAuth['code'] == $MasterClass::CODE_SUCCESS){
+                try {
+                    if ($request->isMethod('post')) {
+                        
+                        DB::beginTransaction();
+                
+                        $status = [];
+    
+                        $cek = DB::select("SELECT * FROM mapping_kamar where id_kamar = ".$request->id);
+                        if ($cek) {
+                            $idbukti = $cek[0]->bukti_perbaikan;
+                            $saved = DB::select("SELECT * FROM bukti_transaksi where id in (".$idbukti.")");
+                            $saved = $MasterClass->checkErrorModel($saved);
+                            $status = $saved;
+                            $results = [
+                                'code' => $status['code'],
+                                'info'  => $status['info'],
+                                'data'  =>  $status['data'],
                             ];
                         }
                             

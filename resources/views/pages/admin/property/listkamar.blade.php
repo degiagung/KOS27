@@ -91,29 +91,16 @@
                     <div class="modal-body">
                         <div class="basic-form">
                             <div class="mb-3 row fotokamar" style-"display:none;">
-                                {{-- <div class="col-sm-3 fotosampul">
-                                    
-                                </div> --}}
-                                <div class="col-sm-3 fotolainnya">
-                                    <label>Foto Lainnya</label>
-                                    <img src="../template/admin/images/ttd.jpg" style="width:100px;height:50px;" alt="">
-                                </div>
-                                <div class="col-sm-3">
-                                    <label>Foto Lainnya</label>
-                                    <img src="../template/admin/images/ttd.jpg" style="width:100px;height:50px;" alt="">
-                                </div>
-                                <div class="col-sm-3">
-                                    <label>Foto Lainnya</label>
-                                    <img src="../template/admin/images/ttd.jpg" style="width:100px;height:50px;" alt="">
-                                </div>
+                               
                             </div>
                             <div class="mb-3 row perbaikan" style="display:none">
                                 <label class="col-sm-3 col-form-label">Perbaikan</label>
-                                <div class="col-sm-9">
+                                <div class="col-sm-7">
                                     <select class="select2add" name="states[]" multiple="multiple" id="form-fasilitas-perbaikan" name="form-fasilitas-perbaikan"> 
 
                                     </select>
                                 </div>
+                                <label class="col-sm-2 col-form-label"><a style="color: red;cursor: pointer;" onClick="buktiperbaikan()">BUKTI</a></label>
                             </div>
                             <div class="divutkpmilik" style="display:none">
 
@@ -238,6 +225,39 @@
             </div>
         </div>
         
+        <div class="modal fade" id="modal-bukti" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header headermodal">
+                        <h5 class="modal-title">Bukti Perbaikan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="basic-form">
+                            <div class="mb-3 row fotobukti">
+                               
+                            </div>
+
+                            <div class="mb-3 row uploadbuktiperbaikan" style="display:none;">
+                                    <label class="col-sm-3 col-form-label">UPLOAD</label>
+                                    <div class="col-sm-9">
+                                       <form role="form" class="" id="formbukti" method="post" type="post" enctype="multipart/form-data">
+                                            <input class="form-control" name="formbukti[]" id="form-bukti" type="file" value="" multiple style="opacity:1;"/>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" oncLICK="savebuktiperbaikan()" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
 @push('after-script')

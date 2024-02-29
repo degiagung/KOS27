@@ -5,6 +5,9 @@ $(document).ready(function () {
     if(role == 'pemilik' || role == 'superadmin'){
         $(".divutkpmilik").show();
     }
+    if(role == 'pemilik' || role == 'superadmin' || role == 'penjaga'){
+        $(".uploadbuktiperbaikan").show();
+    }
     loadfasilitas('kos','fasilitas');
     loadfasilitas('penghuni','fasilitas-penghuni');
     loadtipe();
@@ -152,7 +155,10 @@ function getListData() {
                 mRender: function (data, type, row) {
                     // if(role == 'superadmin'){
                         var $rowData = `<button type="button" class="btn btn-primary btn-icon-sm mx-2 edit-btn"><i class="bi bi-pencil-square"></i></button>`;
-                        $rowData += `<button type="button" class="btn btn-danger btn-icon-sm delete-btn"><i class="bi bi-x-square"></i></button>`;
+                        if(role == 'penjaga' || role == 'superadmin' || role == 'pemilik'){
+                            $(".uploadbuktiperbaikan").show();
+                            $rowData += `<button type="button" class="btn btn-danger btn-icon-sm delete-btn"><i class="bi bi-x-square"></i></button>`;
+                        }
                         return $rowData;
                     // }
                 },
@@ -340,6 +346,75 @@ function fotokamar(id){
     });
 }
 
+function buktiperbaikan(){
+    $("#modal-bukti").modal('show');
+    $(".fotobukti").empty();
+    $.ajax({
+    type: 'POST',
+    dataType: 'json',
+    url: baseURL + '/getfotoperbaikan',
+    data: {
+        id    : isObject['id'],
+
+    }, success: function(result){
+        $(".fotobukti").show();
+        var content = '';
+        $.each(result.data, function(i,e){
+            file = baseURL+e['alamat'].replaceAll('../public','')+e['file'];
+            content +=`<div class="col-sm-6">
+            <img src="`+file+`" style="width:200px;height:150px;" alt="">
+            </div>
+            `;
+            
+        });
+        $(".fotobukti").append(content);
+    }
+    });
+}
+
+function savebuktiperbaikan(){
+    if (
+            validationSwalFailed(
+                ($("#form-bukti").val()),
+                "Bukti Perbaikan tidak boleh kosong"
+            )
+        )
+            return false;
+    if (
+            validationSwalFailed(
+                ($("#form-fasilitas-perbaikan").val()),
+                "Fasilitas yang diperbaiki tidak boleh kosong"
+            )
+        )
+            return false;
+
+    const formData    = new FormData(document.getElementById("formbukti"));
+    formData.append('id',isObject['id']);
+    $.ajax({
+        url: baseURL + "/savebuktiperbaikan",
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+            Swal.fire({
+                title: "Loading",
+                text: "Please wait...",
+            });
+        },
+        success: function (response) {
+            // Handle response sukses
+            if (response.code == 0) {
+                buktiperbaikan();
+            } else {
+                sweetAlert("Oops...", response.info, "ERROR");
+            }
+        },
+        error: function (xhr, status, error) {
+            sweetAlert("Oops...", "ERROR", "ERROR");
+        },
+    });
+}
 $("#add-btn").on("click", function (e) {
     $(".fotokamar").hide();
     $(".perbaikan").hide();
